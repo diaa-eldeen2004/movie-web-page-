@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>YMD</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Icons CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <%- include('../partials/navbar.ejs') %>
+
+    <!-- Hero Section -->
+    <% if (sliderMovies && sliderMovies.length > 0) { %>
+    <section class="hero-section">
+      <div
+        id="mainCarousel"
+        class="carousel slide custom-carousel"
+        data-bs-ride="carousel"
+        data-bs-interval="5000"
+      >
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+          <% sliderMovies.forEach((_, i) => { %>
+          <button
+            type="button"
+            data-bs-target="#mainCarousel"
+            data-bs-slide-to="<%= i %>"
+            class="<%= i === 0 ? 'active' : '' %>"
+            aria-current="<%= i === 0 ? 'true' : 'false' %>"
+            aria-label="Slide <%= i + 1 %>"
+          ></button>
+          <% }) %>
+        </div>
+
+        <!-- Slides -->
+        <div class="carousel-inner">
+          <% sliderMovies.forEach((movie, i) => { %>
+          <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+            <img
+              src="<%= movie.posterURL %>"
+              class="d-block w-100"
+              alt="<%= movie.title %>"
+            />
+            <div class="hero-content">
+              <h1><%= movie.title %></h1>
+              <div class="metadata">
+                <span>⭐ <%= movie.rating %></span> |
+                <span><%= movie.genre.join(', ') %></span> |
+                <span><%= movie.duration %> min</span>
+              </div>
+              <p class="description"><%= movie.description %></p>
+              <div class="action-buttons">
+                <a
+                  href="/api/movies/<%= movie._id %>"
+                  class="action-button watch-now"
+                >
+                  <i class="fas fa-play"></i> Watch Now
+                </a>
+                <% if (movie.trailerURL) { %>
+                <a
+                  href="<%= movie.trailerURL %>"
+                  class="action-button trailer"
+                  target="_blank"
+                >
+                  <i class="fas fa-film"></i> Trailer
+                </a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+
+        <!-- Arrows -->
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#mainCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#mainCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </section>
+    <% } else { %>
+    <section
+      class="hero-section d-flex justify-content-center align-items-center"
+      style="height: 60vh; background-color: #000"
+    >
+      <h2 style="color: white">No featured movies in slider yet</h2>
+    </section>
+    <% } %>
+
+    <!-- Trending Now -->
+    <section class="movie-section">
+      <h2 class="category-title">Trending Now</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (trendingMovies && trendingMovies.length > 0) { %> <%
+          trendingMovies.forEach(movie => { %>
+          <div class="movie-card">
+            <img src="<%= movie.posterURL %>" alt="<%= movie.title %>" />
+            <div class="movie-card-rating">⭐ <%= movie.rating %></div>
+            <div class="movie-card-content">
+              <div class="movie-card-title"><%= movie.title %></div>
+              <div class="movie-card-info">
+                <%= movie.releaseYear %> • <%= movie.genre.join(', ') %>
+              </div>
+              <div class="movie-card-buttons">
+                <a
+                  href="/api/movies/<%= movie._id %>"
+                  class="movie-card-button watch-btn"
+                >
+                  <i class="fas fa-play"></i> Watch
+                </a>
+                <a
+                  href="/api/movies/<%= movie._id %>"
+                  class="movie-card-button info-btn"
+                >
+                  <i class="fas fa-info-circle"></i> Info
+                </a>
+              </div>
+            </div>
+          </div>
+          <% }) %> <% } else { %>
+          <div class="no-movies">
+            <p>No trending movies at the moment.</p>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- New Releases -->
+      <h2 class="category-title">New Releases</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (newReleaseMovies && newReleaseMovies.length > 0) { %> <%
+          newReleaseMovies.forEach(movie => { %>
+          <div class="movie-card">
+            <img src="<%= movie.posterURL %>" alt="<%= movie.title %>" />
+            <div class="movie-card-rating">⭐ <%= movie.rating %></div>
+            <div class="movie-card-content">
+              <div class="movie-card-title"><%= movie.title %></div>
+              <div class="movie-card-info">
+                <%= movie.releaseYear %> • <%= movie.genre.join(', ') %>
+              </div>
+              <div class="movie-card-buttons">
+                <a
+                  href="/api/movies/<%= movie._id %>"
+                  class="movie-card-button watch-btn"
+                >
+                  <i class="fas fa-play"></i> Watch
+                </a>
+                <a
+                  href="/api/movies/<%= movie._id %>"
+                  class="movie-card-button info-btn"
+                >
+                  <i class="fas fa-info-circle"></i> Info
+                </a>
+              </div>
+            </div>
+          </div>
+          <% }) %> <% } else { %>
+          <div class="no-movies">
+            <p>No new releases available.</p>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Button -->
+    <% if (user != null && user.role == 'admin') { %>
+    <a href="/admin/:<%= user.id %>" class="sticky-button">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+    <% } %> <%- include('../partials/footer.ejs') %>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="/js/script.js"></script>
+  </body>
+</html>

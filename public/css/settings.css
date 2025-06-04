@@ -1,0 +1,132 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: #131A26; /* Default Background */
+    color: #E3F6FC; /* Soft Text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Settings Container */
+.settings-container {
+    background: #1E2738;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 195, 255, 0.3);
+    text-align: center;
+    width: 400px;
+}
+
+h1 {
+    color: #FDCB58;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #08D9FF;
+    margin-bottom: 15px;
+}
+
+/* Theme Buttons */
+.theme-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.theme-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 28px;
+    color: #08D9FF;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.theme-btn:hover {
+    color: #FDCB58;
+}
+
+/* Tooltip */
+.theme-btn .tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.theme-btn:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Dark Mode */
+.dark-theme {
+    background-color: #0A0F1A;
+    color: #B0C4DE;
+}
+
+.dark-theme .settings-container {
+    background: #08101B;
+}
+
+.dark-theme .theme-btn {
+    color: #00A8E8;
+}
+
+.dark-theme .theme-btn:hover {
+    color: #FFD700;
+}
+
+/* Light Mode */
+.light-theme {
+    background-color: #F5F5F5;
+    color: #2C3E50;
+}
+
+.light-theme .settings-container {
+    background: #DDE6ED;
+}
+
+.light-theme .theme-btn {
+    color: #0056B3;
+}
+
+.light-theme .theme-btn:hover {
+    color: #FF5733;
+}
+
+.P-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  
+  .P-btn:hover {
+    background-color: #cc0000;
+  }

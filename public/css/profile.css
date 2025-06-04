@@ -1,0 +1,252 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+  }
+  
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1E2738;
+  }
+  
+  .container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 400px;
+    min-height: 350px;
+    border: 2px solid #058f9c;
+    border-radius: 18px;
+    padding: 20px 50px;
+    animation-name: animation;
+    animation-duration: 5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    box-shadow: 10px 10px 50px #033e81;
+    transition: all ease-in 0.2s;
+  }
+  
+  @keyframes animation {
+    0% {
+      box-shadow: 10px 10px 50px #033e81;
+    }
+    50% {
+      box-shadow: -10px 20px 50px #3181dc;
+    }
+    100% {
+      box-shadow: 10px -20px 50px #1270ab;
+    }
+  }
+  
+  h2 {
+    color: #08ECFF;
+    margin: 15px 0 10px;
+  }
+  
+  p {
+    color: #b4d8db;
+    font-size: 16px;
+  }
+  
+  /* Profile image */
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background-color: #2a2a2a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  .default-icon {
+    font-size: 60px;
+    color: #07cad2;
+  }
+  
+  .user-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #223d73;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    margin-bottom: 15px;
+  }
+  
+  .user-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .default-icon {
+    font-size: 40px;
+    color: #08ECFF;
+  }
+  
+  .P-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .P-btn:hover {
+    background-color: #cc0000;
+  }
+
+  /* Dark Mode */
+.dark-theme {
+    background-color: #0A0F1A;
+    color: #B0C4DE;
+}
+
+.dark-theme h1,
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme h4,
+.dark-theme h5,
+.dark-theme h6,
+.dark-theme p {
+    color: #B0C4DE;
+}
+
+.dark-theme .navbar {
+    background: #08101B;
+}
+
+.dark-theme .nav-icon {
+    color: #00A8E8;
+}
+
+.dark-theme .nav-icon:hover {
+    color: #FFD700;
+}
+
+.dark-theme .navbar_2 {
+    background-color: #0F1A2E;
+}
+
+.dark-theme .navbar_2 a {
+    color: #A8C7E0;
+}
+
+.dark-theme .navbar_2 a:hover {
+    background: #00A8E8;
+    color: #0F1A2E;
+    box-shadow: 0px 0px 8px rgba(0, 168, 232, 0.7);
+}
+
+.dark-theme .search-container input {
+    background-color: #1E2738;
+    border: 1px solid #08D9FF;
+    color: #E3F6FC;
+}
+
+.dark-theme .search-container i {
+    color: #08D9FF;
+}
+
+.dark-theme .glowing-border {
+    animation: border-glow-dark 3s infinite alternate;
+}
+
+
+/* Light Mode */
+.light-theme {
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme h4,
+.light-theme h5,
+.light-theme h6,
+.light-theme p {
+    color: #000000;
+}
+
+.light-theme .navbar {
+    background: #E3E3E3;
+}
+
+.light-theme .nav-icon {
+    color: #1a1b1d;
+}
+
+.light-theme .nav-icon:hover {
+    color: #FF5733;
+}
+
+.light-theme .navbar_2 {
+    background-color: #E3E3E3;
+}
+
+.light-theme .navbar_2 a {
+    color: #333;
+}
+
+.light-theme .navbar_2 a:hover {
+    background: #FF5733;
+    color: #FFFFFF;
+    box-shadow: 0px 0px 8px rgba(255, 87, 51, 0.7);
+}
+
+.light-theme .search-container input {
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    color: #000;
+}
+
+.light-theme .search-container i {
+    color: #FF5733;
+}
+
+.light-theme .glowing-border {
+    animation: border-glow-light 3s infinite alternate;
+}
+
+
+/* Dark Mode Glow */
+@keyframes border-glow-dark {
+    0% { box-shadow: inset 0px 0px 20px #05264c; }
+    50% { box-shadow: inset -5px -5px 20px #1270ab; }
+    100% { box-shadow: inset 0px 0px 20px #033e81; }
+}
+
+/* Light Mode Glow */
+@keyframes border-glow-light {
+    0% { box-shadow: inset 0px 0px 20px #ffc107; }
+    50% { box-shadow: inset -5px -5px 20px #ff6f00; }
+    100% { box-shadow: inset 0px 0px 20px #ff9800; }
+}
+
+  
+  

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= movie.title %> - Details</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/css/styles.css" />
+
+    <!-- Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <!-- Toastify CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <%- include('../partials/navbar.ejs') %>
+
+    <!-- Movie Detail Section -->
+    <section class="container my-5 pt-5">
+      <h1 class="mb-4 text-center fw-bold"><%= movie.title %></h1>
+
+      <div class="row align-items-start">
+        <!-- Poster -->
+        <div class="col-md-4 mb-4 text-center">
+          <img
+            src="<%= movie.posterURL %>"
+            alt="<%= movie.title %> poster"
+            class="img-fluid rounded shadow"
+            style="max-height: 300px; object-fit: contain"
+          />
+        </div>
+
+        <!-- Trailer -->
+        <% if (movie.trailerURL) { %>
+        <div class="col-md-8 mb-4">
+          <div class="ratio ratio-16x9">
+            <iframe
+              src="<%= movie.trailerURL.replace('watch?v=', 'embed/') %>"
+              title="Trailer"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+        <% } %>
+      </div>
+
+      <!-- Metadata -->
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <p><strong>Description:</strong> <%= movie.description %></p>
+          <p><strong>Genre:</strong> <%= movie.genre.join(', ') %></p>
+          <p><strong>Rating:</strong> ⭐ <%= movie.rating %></p>
+          <p><strong>Duration:</strong> <%= movie.duration %> minutes</p>
+        </div>
+      </div>
+    </section>
+   
+    <% if (user) { %>
+  <div class="text-center my-3">
+    <button 
+      class="btn btn-outline-danger save-to-list"
+      data-movie-id="<%= movie._id %>">
+      <i class="fas fa-heart"></i> Save to My List
+    </button>
+  </div>
+<% } %>
+  </div>
+
+  <script type="module">
+        import showFunToast from "/js/toast.js";
+
+document.querySelectorAll(".save-to-list").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    const movieId = btn.dataset.movieId;
+    try {
+      const res = await fetch(`/mylist/${movieId}`, {
+        method: "POST",
+        credentials: "include", // to send cookies/session
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        showFunToast(data.message || "✅ Movie added to your list!", "linear-gradient(to right, #00eaff, #00a8b5)");
+      } else {
+        showFunToast(data.message || "❗ Couldn't add movie.", "red");
+      }
+    } catch (err) {
+      showFunToast("❗ Network error", "red");
+    }
+  });
+});
+      </script>
+
+    
+
+    <!-- Footer -->
+    <%- include('../partials/footer.ejs') %>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script type="module" src="/js/script.js"></script>
+  </body>
+</html>
