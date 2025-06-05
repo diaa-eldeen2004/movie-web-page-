@@ -84,6 +84,32 @@
 <% } %>
   </div>
 
+  <!-- You May Like Section -->
+<% if (relatedMovies && relatedMovies.length > 0) { %>
+  <section class="container my-5">
+    <h2 class="mb-4 fw-bold">You May Like</h2>
+    <div class="row">
+      <% relatedMovies.forEach(similar => { %>
+        <div class="col-6 col-sm-4 col-md-3 mb-4">
+          <a href="/api/movies/<%= similar._id %>" class="text-decoration-none">
+            <div class="card shadow-sm h-100">
+              <img
+                src="<%= similar.posterURL %>"
+                class="card-img-top"
+                alt="<%= similar.title %> poster"
+                style="height: 250px; object-fit: cover"
+              />
+              <div class="card-body text-center">
+                <h6 class="card-title"><%= similar.title %></h6>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
   <script type="module">
         import showFunToast from "/js/toast.js";
 
@@ -91,7 +117,7 @@ document.querySelectorAll(".save-to-list").forEach((btn) => {
   btn.addEventListener("click", async (e) => {
     const movieId = btn.dataset.movieId;
     try {
-      const res = await fetch(`/mylist/${movieId}`, {
+      const res = await fetch(`/api/mylist/${movieId}`, {
         method: "POST",
         credentials: "include", // to send cookies/session
       });
