@@ -153,8 +153,8 @@
           </div>
 
           <div class="form-group">
-            <label for="movies">Movie IDs (comma-separated, optional)</label>
-            <input type="text" id="movies" name="movies" placeholder="e.g. 123,456" />
+            <label for="movies">Movie Names (comma-separated, optional)</label>
+            <input type="text" id="movies" name="movies" placeholder="e.g. Inception, Titanic" />
           </div>
         </div>
 
@@ -194,7 +194,7 @@
         };
 
         try {
-          const response = await fetch("/cast", {
+          const response = await fetch("/api/cast", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),

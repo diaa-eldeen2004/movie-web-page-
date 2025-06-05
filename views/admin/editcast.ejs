@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add Movie - X-System</title>
+    <title>Edit Cast Member - X-System</title>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       rel="stylesheet"
@@ -74,11 +74,9 @@
       }
 
       input[type="text"],
-      input[type="number"],
       input[type="date"],
       input[type="url"],
-      textarea,
-      select {
+      textarea {
         width: 100%;
         padding: 12px;
         background: rgba(255, 255, 255, 0.1);
@@ -90,8 +88,7 @@
       }
 
       input:focus,
-      textarea:focus,
-      select:focus {
+      textarea:focus {
         outline: none;
         border-color: #00eaff;
         box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
@@ -100,52 +97,6 @@
       textarea {
         min-height: 120px;
         resize: vertical;
-      }
-
-      .cast-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .cast-item {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-
-      .cast-item input {
-        flex: 1;
-      }
-
-      .btn-remove {
-        background: none;
-        border: none;
-        color: #ff5e5e;
-        cursor: pointer;
-        font-size: 1.2rem;
-        padding: 5px;
-        transition: all 0.3s ease;
-      }
-
-      .btn-remove:hover {
-        color: #ff0000;
-        transform: scale(1.1);
-      }
-
-      .btn-add {
-        background: none;
-        border: none;
-        color: #00eaff;
-        cursor: pointer;
-        font-size: 1.2rem;
-        padding: 5px;
-        transition: all 0.3s ease;
-      }
-
-      .btn-add:hover {
-        color: #00a8b5;
-        transform: scale(1.1);
       }
 
       .submit-btn {
@@ -165,283 +116,159 @@
         transform: translateY(-2px);
         box-shadow: 0 5px 20px rgba(0, 234, 255, 0.2);
       }
-
-      .genre-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 10px;
-      }
-
-      .genre-tag {
-        background: rgba(0, 234, 255, 0.1);
-        padding: 5px 15px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .genre-tag button {
-        background: none;
-        border: none;
-        color: #ff5e5e;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <i class="fas fa-film"></i>
-        <h1>Edit Movie</h1>
+        <i class="fas fa-user"></i>
+        <h1>Edit Cast Member</h1>
       </div>
 
-      <form id="addMovieForm" action="/api/movies" method="POST">
+      <form id="addCastForm">
         <div class="form-grid">
-          <!-- Title -->
           <div class="form-group">
-            <label for="title">Movie Title</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value="<%= movie.title %>"
-            />
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" value="<%= cast.name %>" />
           </div>
 
-          <!-- Release Date -->
           <div class="form-group">
-            <label for="releasedate">Release Date</label>
+            <label for="birthdate">Birthdate</label>
             <input
               type="date"
-              id="releasedate"
-              name="releasedate"
-              value="<%= new Date(movie.releasedate).toISOString().slice(0, 10) %>"
+              id="birthdate"
+              name="birthdate"
+              value="<%= new Date(cast.birthdate).toISOString().slice(0, 10) %>"
             />
           </div>
 
-          <!-- Duration -->
           <div class="form-group">
-            <label for="duration">Duration (minutes)</label>
-            <input
-              type="number"
-              id="duration"
-              name="duration"
-              min="1"
-              placeholder="Enter duration in minutes"
-              value="<%= movie.duration %>"
-            />
-          </div>
-
-          <!-- Rating -->
-          <div class="form-group">
-            <label for="rating">Rating (0-10)</label>
-            <input
-              type="number"
-              id="rating"
-              name="rating"
-              step="0.1"
-              placeholder="Enter rating"
-              value="<%= movie.rating %>"
-            />
-          </div>
-
-          <!-- Genre -->
-          <div class="form-group">
-            <label for="genre">Genre</label>
+            <label for="nationality">Nationality</label>
             <input
               type="text"
-              id="genre"
-              name="genre"
-              placeholder="Enter genres separated by commas (e.g., Action, Drama, Sci-Fi)"
-              value="<%= movie.genre %>"
+              id="nationality"
+              name="nationality"
+              value="<%= cast.nationality %>"
             />
           </div>
 
-          <!-- Cast -->
-          <div class="form-group">
-            <label for="cast">Cast Members</label>
-            <input
-              type="text"
-              id="cast"
-              name="cast"
-              placeholder="Enter cast members separated by commas (e.g., John Doe, Jane Smith)"
-              value="<%= movie.cast.map(actor => actor.name).join(', ') %>"
-            />
-          </div>
-
-          <!-- Description -->
           <div class="form-group full-width">
             <label for="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              placeholder="Enter movie description"
-            >
-<%= movie.description %></textarea
+            <textarea id="description" name="description">
+<%= cast.description %></textarea
             >
           </div>
 
-          <!-- Poster URL -->
           <div class="form-group">
-            <label for="posterURL">Poster URL</label>
+            <label for="profileImageURL">Profile Image URL</label>
             <input
               type="url"
-              id="posterURL"
-              name="posterURL"
-              placeholder="Enter poster image URL"
-              value="<%= movie.posterURL %>"
+              id="profileImageURL"
+              name="profileImageURL"
+              value="<%= cast.profileImageURL %>"
             />
           </div>
 
-          <!-- Trailer URL -->
           <div class="form-group">
-            <label for="trailerURL">Trailer URL</label>
+            <label for="movies">Movie Names (comma-separated, optional)</label>
             <input
-              type="url"
-              id="trailerURL"
-              name="trailerURL"
-              placeholder="Enter trailer video URL"
-              value="<%= movie.trailerURL %>"
+              type="text"
+              id="movies"
+              name="movies"
+              placeholder="e.g. Inception, Titanic"
+              value="<%= cast.movies.map(movie => movie.title).join(', ') %>"
             />
-          </div>
-
-          <!-- Category -->
-          <div class="form-group">
-            <label for="category">Category</label>
-            <select id="category" name="category">
-              <option value="trending" <%= movie.category === "trending" ? "selected" : "" %>>Trending</option>
-              <option value="new release" <%= movie.category === "new release" ? "selected" : "" %>>New Release</option>
-            </select>
           </div>
         </div>
 
         <button type="submit" class="submit-btn">
-          <i class="fas fa-save"></i> Save Movie
+          <i class="fas fa-save"></i> Edit Cast
         </button>
       </form>
     </div>
-
-    <script type="module">
-      import showFunToast from "/js/toast.js";
-    
-      document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector("#addMovieForm");
-        const titleInput = form.querySelector('input[name="title"]');
-        const releaseDateInput = form.querySelector('input[name="releasedate"]');
-        const durationInput = form.querySelector('input[name="duration"]');
-        const ratingInput = form.querySelector('input[name="rating"]');
-        const genreInput = form.querySelector('input[name="genre"]');
-        const castInput = form.querySelector('input[name="cast"]');
-        const descriptionInput = form.querySelector('textarea[name="description"]');
-        const posterURLInput = form.querySelector('input[name="posterURL"]');
-        const trailerURLInput = form.querySelector('input[name="trailerURL"]');
-        const categorySelect = form.querySelector('select[name="category"]');
-    
-        const movieId = "<%= movie._id %>";
-    
-        const originalValues = {
-          title: titleInput.value,
-          releasedate: releaseDateInput.value,
-          duration: durationInput.value,
-          rating: ratingInput.value,
-          genre: genreInput.value,
-          cast: castInput.value,
-          description: descriptionInput.value,
-          posterURL: posterURLInput.value,
-          trailerURL: trailerURLInput.value,
-          category: categorySelect.value,
-        };
-    
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-    
-          const title = titleInput.value.trim();
-          const releasedate = releaseDateInput.value;
-          const duration = durationInput.value.trim();
-          const rating = ratingInput.value.trim();
-          const genre = genreInput.value.trim();
-          const cast = castInput.value.trim();
-          const description = descriptionInput.value.trim();
-          const posterURL = posterURLInput.value.trim();
-          const trailerURL = trailerURLInput.value.trim();
-          const category = categorySelect.value;
-    
-          if (!title || !releasedate || !duration || !rating || !genre || !description || !posterURL || !trailerURL || !category) {
-            showFunToast("❌ Please fill in all required fields.", "red");
-            return;
-          }
-    
-          const hasChanged =
-            title !== originalValues.title ||
-            releasedate !== originalValues.releasedate ||
-            duration !== originalValues.duration ||
-            rating !== originalValues.rating ||
-            genre !== originalValues.genre ||
-            cast !== originalValues.cast ||
-            description !== originalValues.description ||
-            posterURL !== originalValues.posterURL ||
-            trailerURL !== originalValues.trailerURL ||
-            category !== originalValues.category;
-    
-          if (!hasChanged) {
-            showFunToast("ℹ️ No changes detected.", "red");
-            return;
-          }
-    
-          const ratingNum = parseFloat(rating);
-          if (isNaN(ratingNum) || ratingNum < 0 || ratingNum > 10) {
-            showFunToast("❌ Rating must be between 0 and 10.", "red");
-            return;
-          }
-    
-          const durationNum = parseInt(duration);
-          if (isNaN(durationNum) || durationNum <= 0) {
-            showFunToast("❌ Duration must be a positive number.", "red");
-            return;
-          }
-    
-          const genres = genre.split(",").map((g) => g.trim()).filter(Boolean);
-          const castMembers = cast.split(",").map((c) => ({ name: c.trim() })).filter((c) => c.name);
-    
-          const body = {
-            title,
-            releasedate,
-            duration: durationNum,
-            rating: ratingNum,
-            genre: genres,
-            cast: castMembers,
-            description,
-            posterURL,
-            trailerURL,
-            category,
-          };
-    
-          try {
-            const response = await fetch(`/api/movies/${movieId}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(body),
-            });
-    
-            const data = await response.json();
-    
-            if (response.ok) {
-              showFunToast("✅ Movie updated successfully!", "linear-gradient(to right, #00eaff, #00a8b5)");
-              setTimeout(() => {
-                window.location.href = `/admin/:id`;
-              }, 1500);
-            } else {
-              showFunToast(data.message || "❌ Update failed.", "red");
-            }
-          } catch (err) {
-            console.error("Update error:", err);
-            showFunToast("❌ Server error occurred.", "red");
-          }
-        });
-      });
-    </script>
   </body>
 </html>
+
+<script type="module">
+  import showFunToast from "/js/toast.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("#addCastForm");
+
+    const nameInput = document.querySelector('input[name="name"]');
+    const birthdateInput = document.querySelector('input[name="birthdate"]');
+    const nationalityInput = document.querySelector('input[name="nationality"]');
+    const descriptionInput = document.querySelector('textarea[name="description"]');
+    const profileImageURLInput = document.querySelector('input[name="profileImageURL"]');
+    const moviesInput = document.querySelector('input[name="movies"]');
+
+    const castId = "<%= cast._id %>";
+
+    const originalValues = {
+      name: nameInput.value,
+      birthdate: birthdateInput.value,
+      nationality: nationalityInput.value,
+      description: descriptionInput.value.trim(),
+      profileImageURL: profileImageURLInput.value,
+      movies: moviesInput.value,
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = nameInput.value.trim();
+      const birthdate = birthdateInput.value;
+      const nationality = nationalityInput.value.trim();
+      const description = descriptionInput.value.trim();
+      const profileImageURL = profileImageURLInput.value.trim();
+      const movies = moviesInput.value.trim().split(",").map(m => m.trim()).filter(Boolean);
+
+      if (!name || !birthdate || !nationality || !description || !profileImageURL) {
+        return showFunToast("❌ Please fill in all required fields.", "red");
+      }
+
+      const hasChanged =
+        name !== originalValues.name ||
+        birthdate !== originalValues.birthdate ||
+        nationality !== originalValues.nationality ||
+        description !== originalValues.description ||
+        profileImageURL !== originalValues.profileImageURL ||
+        movies.join(",") !== originalValues.movies;
+
+      if (!hasChanged) {
+        return showFunToast("ℹ️ No changes detected.", "orange");
+      }
+
+      const payload = {
+        name,
+        birthdate,
+        nationality,
+        description,
+        profileImageURL,
+        movies, // list of movie names
+      };
+
+      try {
+        const response = await fetch(`/api/cast/update/${castId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showFunToast("✅ Cast updated successfully!", "linear-gradient(to right, #00eaff, #00a8b5)");
+          setTimeout(() => {
+            window.location.href = "/admin/admin"; // or redirect as needed
+          }, 1500);
+        } else {
+          showFunToast(result.error || "❌ Failed to update cast.", "red");
+        }
+      } catch (error) {
+        console.error("Update error:", error);
+        showFunToast("❌ Server error occurred.", "red");
+      }
+    });
+  });
+</script>

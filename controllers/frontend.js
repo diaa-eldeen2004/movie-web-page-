@@ -159,8 +159,7 @@ export const getAddCast = (req, res) => {
 
 export const getEditCast= async (req, res) => {
   try {
-    const castid = req.params.id;
-    const cast = await MovieModel.findById(castid);
+    const cast = await CastModel.findById(req.params.id).populate("movies", "title"); // or "title" depending on your schema
     if (!cast) {
       return res.status(404).send("cast not found");
     }
