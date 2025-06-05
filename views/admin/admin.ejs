@@ -187,15 +187,14 @@
         box-shadow: 0 5px 20px rgba(0, 234, 255, 0.2);
       }
 
-      /* Movie Grid Styles */
-      .movie-grid {
+      .movie-grid, .cast-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 25px;
         padding: 20px 0;
       }
 
-      .movie-card {
+      .movie-card, .cast-card {
         background: rgba(0, 0, 0, 0.9);
         border-radius: 12px;
         overflow: hidden;
@@ -203,30 +202,30 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
-      .movie-card:hover {
+      .movie-card:hover, .cast-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 5px 20px rgba(0, 234, 255, 0.2);
       }
 
-      .movie-poster {
+      .movie-poster, .cast-image {
         width: 100%;
         height: 200px;
         object-fit: cover;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
 
-      .movie-info {
+      .movie-info, .cast-info {
         padding: 20px;
       }
 
-      .movie-title {
+      .movie-title, .cast-name {
         font-size: 1.2rem;
         font-weight: bold;
         margin-bottom: 10px;
         color: #fff;
       }
 
-      .movie-details {
+      .movie-details, .cast-details {
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -234,18 +233,18 @@
         font-size: 0.9rem;
       }
 
-      .movie-detail {
+      .movie-detail, .cast-detail {
         display: flex;
         align-items: center;
         gap: 8px;
       }
 
-      .movie-detail i {
+      .movie-detail i, .cast-detail i {
         color: #00eaff;
         width: 20px;
       }
 
-      .movie-actions {
+      .movie-actions, .cast-actions {
         display: flex;
         justify-content: space-between;
         padding: 15px 20px;
@@ -253,7 +252,9 @@
       }
 
       .movie-actions button,
-      .movie-actions a {
+      .movie-actions a,
+      .cast-actions button,
+      .cast-actions a {
         background: none;
         border: none;
         cursor: pointer;
@@ -264,29 +265,34 @@
         text-decoration: none;
       }
 
-      .movie-actions .edit {
+      .movie-actions .edit,
+      .cast-actions .edit {
         color: #00eaff;
       }
 
-      .movie-actions .delete {
+      .movie-actions .delete,
+      .cast-actions .delete {
         color: #ff5e5e;
       }
 
       .movie-actions button:hover,
-      .movie-actions a:hover {
+      .movie-actions a:hover,
+      .cast-actions button:hover,
+      .cast-actions a:hover {
         transform: translateY(-2px);
       }
 
-      .movie-actions .edit:hover {
+      .movie-actions .edit:hover,
+      .cast-actions .edit:hover {
         background: linear-gradient(to right, #00eaff, #00a8b5);
         color: #000;
       }
 
-      .movie-actions .delete:hover {
+      .movie-actions .delete:hover,
+      .cast-actions .delete:hover {
         background-color: rgba(255, 94, 94, 0.2);
       }
 
-      /* Add smooth transitions for all interactive elements */
       tr,
       .action-btn,
       .add-user {
@@ -305,7 +311,9 @@
         <a href="#" data-entity="Movies" class="active"
           ><i class="fas fa-film"></i> Movies</a
         >
-        <a href="#" data-entity="Series"><i class="fas fa-tv"></i> Series</a>
+        <a href="#" data-entity="Cast"
+          ><i class="fas fa-users"></i> Cast</a
+        >
         <a href="#" data-entity="SliderMovies"
           ><i class="fas fa-sliders"></i> Slider Movies</a
         >
@@ -317,717 +325,821 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
-      <h2 id="contentHeading">Movies</h2>
+   
+    
+<!-- Main Content -->
+<div class="main-content">
+  <h2 id="contentHeading">Movies</h2>
 
-      <!-- Add Movie Button (Shown only when Movies table is visible) -->
-      <div id="addMovieButton" style="margin: 20px 0">
-        <a
-          href="/addmovie"
-          class="action-btn add-user"
-          title="Add Movie"
-          style="
-            text-decoration: none;
-            padding: 12px 25px;
-            background: linear-gradient(to right, #fff, #ccc);
-            color: #000;
-            border-radius: 8px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-          "
-        >
-          <i class="fas fa-film"></i> Add Movie
-        </a>
+  <!-- Add Movie Button (Shown only when Movies grid is visible) -->
+  <div id="addMovieButton" style="margin: 20px 0">
+    <a
+      href="/addmovie"
+      class="action-btn add-user"
+      title="Add Movie"
+      style="
+        text-decoration: none;
+        padding: 12px 25px;
+        background: linear-gradient(to right, #fff, #ccc);
+        color: #000;
+        border-radius: 8px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      "
+    >
+      <i class="fas fa-film"></i> Add Movie
+    </a>
+  </div>
+
+  <!-- Movie Grid -->
+  <div id="movieDisplay">
+    <div id="movieGrid" class="movie-grid">
+      <% Movie.forEach(movie => { %>
+      <div class="movie-card">
+        <img
+          src="<%= movie.posterURL %>"
+          alt="nabil"
+          class="movie-poster"
+        />
+        <div class="movie-info">
+          <h3 class="movie-title"><%= movie.title %></h3>
+          <div class="movie-details">
+            <div class="movie-detail">
+              <i class="fas fa-clock"></i>
+              <span><%= movie.duration %> minutes</span>
+            </div>
+            <div class="movie-detail">
+              <i class="fas fa-star"></i>
+              <span><%= movie.rating %>/10</span>
+            </div>
+            <div class="movie-detail">
+              <i class="fas fa-calendar"></i>
+              <span
+                ><%= new Date(movie.releasedate).toLocaleDateString()
+                %></span
+              >
+            </div>
+            <div class="movie-detail">
+              <i class="fas fa-film"></i>
+              <span
+                ><%= Array.isArray(movie.genre) ? movie.genre.join(', ') :
+                movie.genre %></span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="movie-actions">
+          <a href="/editmovie/<%= movie._id %>" class="edit" title="Edit">
+            <i class="fas fa-edit"></i>
+          </a>
+          <button
+            class="delete"
+            title="Delete"
+            data-movie-id="<%= movie._id %>"
+            onclick="deleteMovie(this)"
+          >
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
       </div>
+      <% }) %>
+    </div>
+  </div>
 
-      <!-- Movie Grid -->
-      <div id="movieDisplay">
-        <div id="movieGrid" class="movie-grid">
-          <% Movie.forEach(movie => { %>
-          <div class="movie-card">
-            <img
-              src="<%= movie.posterURL %>"
-              alt="nabil"
-              class="movie-poster"
-            />
-            <div class="movie-info">
-              <h3 class="movie-title"><%= movie.title %></h3>
-              <div class="movie-details">
-                <div class="movie-detail">
-                  <i class="fas fa-clock"></i>
-                  <span><%= movie.duration %> minutes</span>
-                </div>
-                <div class="movie-detail">
-                  <i class="fas fa-star"></i>
-                  <span><%= movie.rating %>/10</span>
-                </div>
-                <div class="movie-detail">
-                  <i class="fas fa-calendar"></i>
-                  <span
-                    ><%= new Date(movie.releasedate).toLocaleDateString()
-                    %></span
-                  >
-                </div>
-                <div class="movie-detail">
-                  <i class="fas fa-film"></i>
-                  <span
-                    ><%= Array.isArray(movie.genre) ? movie.genre.join(', ') :
-                    movie.genre %></span
-                  >
-                </div>
+  <!-- Cast Section (Initially Hidden) -->
+  <div id="castDisplay" class="hidden">
+    <!-- Add Cast Button -->
+    <div style="margin: 20px 0">
+      <a
+        href="/addcast"
+        class="action-btn add-user"
+        title="Add Cast"
+        style="
+          text-decoration: none;
+          padding: 12px 25px;
+          background: linear-gradient(to right, #fff, #ccc);
+          color: #000;
+          border-radius: 8px;
+          font-weight: bold;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.3s ease;
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        "
+      >
+        <i class="fas fa-user-plus"></i> Add Cast
+      </a>
+    </div>
+    <!-- Cast Grid -->
+    <div id="castGrid" class="cast-grid">
+      <% if (typeof Cast !== 'undefined' && Cast.length > 0) { %>
+        <% Cast.forEach(cast => { %>
+        <div class="cast-card">
+          <img
+            src="<%= cast.profileImageURL || 'https://via.placeholder.com/200' %>"
+            alt="<%= cast.name %>"
+            class="cast-image"
+          />
+          <div class="cast-info">
+            <h3 class="cast-name"><%= cast.name %></h3>
+            <div class="cast-details">
+              <div class="cast-detail">
+                <i class="fas fa-calendar"></i>
+                <span><%= new Date(cast.birthdate).toLocaleDateString() %></span>
+              </div>
+              <div class="cast-detail">
+                <i class="fas fa-globe"></i>
+                <span><%= cast.nationality %></span>
               </div>
             </div>
-            <div class="movie-actions">
-              <a href="/editmovie/<%= movie._id %>" class="edit" title="Edit">
-                <i class="fas fa-edit"></i>
-              </a>
-              <button
-                class="delete"
-                title="Delete"
-                data-movie-id="<%= movie._id %>"
-                onclick="deleteMovie(this)"
+          </div>
+          <div class="cast-actions">
+            <a href="/editcast/<%= cast._id %>" class="edit" title="Edit">
+              <i class="fas fa-edit"></i>
+            </a>
+            <button
+              class="delete"
+              title="Delete"
+              data-cast-id="<%= cast._id %>"
+              onclick="deleteCast(this)"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+        <% }) %>
+      <% } else { %>
+        <div
+          class="no-cast"
+          style="grid-column: 1 / -1; text-align: center; padding: 40px"
+        >
+          <i
+            class="fas fa-users"
+            style="font-size: 3rem; color: rgba(255, 255, 255, 0.2)"
+          ></i>
+          <p style="margin-top: 20px; color: rgba(255, 255, 255, 0.5)">
+            No cast members yet
+          </p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Slider Movies Section (Initially Hidden) -->
+  <div id="sliderMoviesDisplay" class="hidden">
+    <!-- Add to Slider Button -->
+    <div style="margin: 20px 0">
+      <a
+        href="#"
+        class="action-btn add-user"
+        title="Add to Slider"
+        id="addToSliderBtn"
+        style="
+          text-decoration: none;
+          padding: 12px 25px;
+          background: linear-gradient(to right, #fff, #ccc);
+          color: #000;
+          border-radius: 8px;
+          font-weight: bold;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.3s ease;
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        "
+      >
+        <i class="fas fa-plus"></i> Add Movie to Slider
+      </a>
+    </div>
+    <!-- Slider Movies Grid -->
+    <div id="sliderMoviesGrid" class="movie-grid">
+      <% if (typeof sliderMovies !== 'undefined' && sliderMovies.length > 0) { %>
+        <% sliderMovies.forEach(movie => { %>
+        <div class="movie-card slider-movie">
+          <img
+            src="<%= movie.posterURL %>"
+            alt="<%= movie.title %>"
+            class="movie-poster"
+          />
+          <div class="movie-info">
+            <h3 class="movie-title">
+              <%= movie.title %>
+              <span
+                style="font-size: 0.8rem; font-weight: normal; color: #00eaff"
               >
-                <i class="fas fa-trash-alt"></i>
-              </button>
+                (Position: <%= movie.sliderPosition || 'N/A' %>)
+              </span>
+            </h3>
+            <div class="movie-details">
+              <div class="movie-detail">
+                <i class="fas fa-clock"></i>
+                <span><%= movie.duration %> minutes</span>
+              </div>
+              <div class="movie-detail">
+                <i class="fas fa-star"></i>
+                <span><%= movie.rating %>/10</span>
+              </div>
+              <div class="movie-detail">
+                <i class="fas fa-film"></i>
+                <span
+                  ><%= Array.isArray(movie.genre) ? movie.genre.join(', ') : movie.genre %></span
+                >
+              </div>
             </div>
+          </div>
+          <div class="movie-actions">
+            <button
+              class="edit"
+              title="Edit Slider Position"
+              onclick="editSliderPosition('<%= movie._id %>')"
+            >
+              <i class="fas fa-arrows-alt"></i>
+            </button>
+            <button
+              class="delete"
+              title="Remove from Slider"
+              onclick="removeFromSlider('<%= movie._id %>')"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+        <% }) %>
+      <% } else { %>
+        <div
+          class="no-movies"
+          style="grid-column: 1 / -1; text-align: center; padding: 40px"
+        >
+          <i
+            class="fas fa-film"
+            style="font-size: 3rem; color: rgba(255, 255, 255, 0.2)"
+          ></i>
+          <p style="margin-top: 20px; color: rgba(255, 255, 255, 0.5)">
+            No movies in slider yet
+          </p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Add to Slider Modal -->
+    <div
+      id="addToSliderModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: #1a1a1a;
+          margin: 10% auto;
+          padding: 20px;
+          width: 80%;
+          max-width: 600px;
+          border-radius: 12px;
+          position: relative;
+        "
+      >
+        <span
+          class="close-modal"
+          style="
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #fff;
+          "
+          >×</span
+        >
+        <h2 style="margin-bottom: 20px; color: #00eaff">
+          Add Movie to Slider
+        </h2>
+        <div
+          class="movie-selection-grid"
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+          "
+        >
+          <% Movie.forEach(movie => { %>
+          <div
+            class="movie-selection-card"
+            style="
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 8px;
+              padding: 10px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            "
+            onclick="addToSlider('<%= movie._id %>')"
+          >
+            <img
+              src="<%= movie.posterURL %>"
+              alt="<%= movie.title %>"
+              style="
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                border-radius: 4px;
+              "
+            />
+            <h3 style="margin: 10px 0; font-size: 0.9rem; color: #fff">
+              <%= movie.title %>
+            </h3>
           </div>
           <% }) %>
         </div>
       </div>
+    </div>
 
-      <!-- Slider Movies Section (Initially Hidden) -->
-      <div id="sliderMoviesDisplay" class="hidden">
-        <!-- Add to Slider Button -->
-        <div style="margin: 20px 0">
-          <a
-            href="#"
-            class="action-btn add-user"
-            title="Add to Slider"
-            id="addToSliderBtn"
-            style="
-              text-decoration: none;
-              padding: 12px 25px;
-              background: linear-gradient(to right, #fff, #ccc);
-              color: #000;
-              border-radius: 8px;
-              font-weight: bold;
-              display: inline-flex;
-              align-items: center;
-              gap: 8px;
-              transition: all 0.3s ease;
-              box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            "
-          >
-            <i class="fas fa-plus"></i> Add Movie to Slider
-          </a>
-        </div>
-        <!-- Slider Movies Grid -->
-        <div id="sliderMoviesGrid" class="movie-grid">
-          <% if (typeof sliderMovies !== 'undefined' && sliderMovies.length > 0)
-          { %> <% sliderMovies.forEach(movie => { %>
-          <div class="movie-card slider-movie">
-            <img
-              src="<%= movie.posterURL %>"
-              alt="<%= movie.title %>"
-              class="movie-poster"
-            />
-            <div class="movie-info">
-              <h3 class="movie-title">
-                <%= movie.title %>
-                <span
-                  style="font-size: 0.8rem; font-weight: normal; color: #00eaff"
-                >
-                  (Position: <%= movie.sliderPosition || 'N/A' %>)
-                </span>
-              </h3>
-              <div class="movie-details">
-                <div class="movie-detail">
-                  <i class="fas fa-clock"></i>
-                  <span><%= movie.duration %> minutes</span>
-                </div>
-                <div class="movie-detail">
-                  <i class="fas fa-star"></i>
-                  <span><%= movie.rating %>/10</span>
-                </div>
-                <div class="movie-detail">
-                  <i class="fas fa-film"></i>
-                  <span
-                    ><%= Array.isArray(movie.genre) ? movie.genre.join(', ') :
-                    movie.genre %></span
-                  >
-                </div>
-              </div>
-            </div>
-            <div class="movie-actions">
-              <button
-                class="edit"
-                title="Edit Slider Position"
-                onclick="editSliderPosition('<%= movie._id %>')"
-              >
-                <i class="fas fa-arrows-alt"></i>
-              </button>
-              <button
-                class="delete"
-                title="Remove from Slider"
-                onclick="removeFromSlider('<%= movie._id %>')"
-              >
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </div>
-          </div>
-          <% }) %> <% } else { %>
-          <div
-            class="no-movies"
-            style="grid-column: 1 / -1; text-align: center; padding: 40px"
-          >
-            <i
-              class="fas fa-film"
-              style="font-size: 3rem; color: rgba(255, 255, 255, 0.2)"
-            ></i>
-            <p style="margin-top: 20px; color: rgba(255, 255, 255, 0.5)">
-              No movies in slider yet
-            </p>
-          </div>
-          <% } %>
-        </div>
-
-        <!-- Add to Slider Modal -->
-        <div
-          id="addToSliderModal"
-          class="modal"
+    <div
+      id="sliderPositionModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: #1a1a1a;
+          margin: 10% auto;
+          padding: 20px;
+          width: 80%;
+          max-width: 400px;
+          border-radius: 12px;
+          position: relative;
+          text-align: center;
+          color: white;
+        "
+      >
+        <span
+          class="close-modal"
           style="
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #fff;
           "
+          onclick="closeSliderPositionModal()"
+          >×</span
         >
-          <div
-            class="modal-content"
-            style="
-              background: #1a1a1a;
-              margin: 10% auto;
-              padding: 20px;
-              width: 80%;
-              max-width: 600px;
-              border-radius: 12px;
-              position: relative;
-            "
-          >
-            <span
-              class="close-modal"
-              style="
-                position: absolute;
-                right: 20px;
-                top: 20px;
-                font-size: 24px;
-                cursor: pointer;
-                color: #fff;
-              "
-              >&times;</span
-            >
-            <h2 style="margin-bottom: 20px; color: #00eaff">
-              Add Movie to Slider
-            </h2>
-            <div
-              class="movie-selection-grid"
-              style="
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 20px;
-                max-height: 400px;
-                overflow-y: auto;
-              "
-            >
-              <% Movie.forEach(movie => { %>
-              <div
-                class="movie-selection-card"
-                style="
-                  background: rgba(255, 255, 255, 0.1);
-                  border-radius: 8px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.3s ease;
-                "
-                onclick="addToSlider('<%= movie._id %>')"
-              >
-                <img
-                  src="<%= movie.posterURL %>"
-                  alt="<%= movie.title %>"
-                  style="
-                    width: 100%;
-                    height: 150px;
-                    object-fit: cover;
-                    border-radius: 4px;
-                  "
-                />
-                <h3 style="margin: 10px 0; font-size: 0.9rem; color: #fff">
-                  <%= movie.title %>
-                </h3>
-              </div>
-              <% }) %>
-            </div>
-          </div>
-        </div>
 
-        <div
-          id="sliderPositionModal"
-          class="modal"
+        <h2 style="color: #00eaff; margin-bottom: 20px">
+          Enter Slider Position
+        </h2>
+        <input
+          type="number"
+          id="sliderPositionInput"
+          min="1"
+          max="3"
+          placeholder="1 - 3"
           style="
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-          "
-        >
-          <div
-            class="modal-content"
-            style="
-              background: #1a1a1a;
-              margin: 10% auto;
-              padding: 20px;
-              width: 80%;
-              max-width: 400px;
-              border-radius: 12px;
-              position: relative;
-              text-align: center;
-              color: white;
-            "
-          >
-            <span
-              class="close-modal"
-              style="
-                position: absolute;
-                right: 20px;
-                top: 20px;
-                font-size: 24px;
-                cursor: pointer;
-                color: #fff;
-              "
-              onclick="closeSliderPositionModal()"
-              >&times;</span
-            >
-
-            <h2 style="color: #00eaff; margin-bottom: 20px">
-              Enter Slider Position
-            </h2>
-            <input
-              type="number"
-              id="sliderPositionInput"
-              min="1"
-              max="3"
-              placeholder="1 - 3"
-              style="
-                width: 80%;
-                padding: 12px;
-                border-radius: 8px;
-                border: 1px solid #00eaff;
-                background: rgba(255, 255, 255, 0.1);
-                color: white;
-                margin-bottom: 20px;
-              "
-            />
-            <br />
-            <button
-              onclick="confirmAddToSlider()"
-              style="
-                padding: 12px 20px;
-                border: none;
-                background: linear-gradient(to right, #00eaff, #00a8b5);
-                color: black;
-                font-weight: bold;
-                border-radius: 8px;
-                cursor: pointer;
-              "
-            >
-              Add to Slider
-            </button>
-          </div>
-        </div>
-
-        <!-- Edit Position Modal -->
-        <div
-          id="editPositionModal"
-          class="modal"
-          style="
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-          "
-        >
-          <div
-            class="modal-content"
-            style="
-              background: #1a1a1a;
-              margin: 10% auto;
-              padding: 20px;
-              width: 80%;
-              max-width: 400px;
-              border-radius: 12px;
-              position: relative;
-            "
-          >
-            <span
-              class="close-modal"
-              style="
-                position: absolute;
-                right: 20px;
-                top: 20px;
-                font-size: 24px;
-                cursor: pointer;
-                color: #fff;
-              "
-              >&times;</span
-            >
-            <h2 style="margin-bottom: 20px; color: #00eaff">
-              Edit Slider Position
-            </h2>
-            <div
-              class="position-controls"
-              style="display: flex; flex-direction: column; gap: 15px"
-            >
-              <label style="color: #fff">Position in Slider:</label>
-              <input
-                type="number"
-                id="sliderPosition"
-                min="1"
-                style="
-                  padding: 10px;
-                  background: rgba(255, 255, 255, 0.1);
-                  border: 1px solid rgba(255, 255, 255, 0.2);
-                  border-radius: 4px;
-                  color: #fff;
-                "
-              />
-              <button
-                onclick="saveSliderPosition()"
-                style="
-                  padding: 10px;
-                  background: linear-gradient(to right, #00eaff, #00a8b5);
-                  border: none;
-                  border-radius: 4px;
-                  color: #000;
-                  font-weight: bold;
-                  cursor: pointer;
-                "
-              >
-                Save Position
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add User Button (Shown only when Users table is visible) -->
-      <div id="addUserButton" class="hidden" style="margin: 20px 0">
-        <a
-          href="/adduser"
-          class="action-btn add-user"
-          title="Add User"
-          style="
-            text-decoration: none;
-            padding: 12px 25px;
-            background: linear-gradient(to right, #fff, #ccc);
-            color: #000;
+            width: 80%;
+            padding: 12px;
             border-radius: 8px;
+            border: 1px solid #00eaff;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 20px;
+          "
+        />
+        <br />
+        <button
+          onclick="confirmAddToSlider()"
+          style="
+            padding: 12px 20px;
+            border: none;
+            background: linear-gradient(to right, #00eaff, #00a8b5);
+            color: black;
             font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
           "
         >
-          <i class="fas fa-user-plus"></i> Add User
-        </a>
-      </div>
-      <!-- User Table (Initially Hidden) -->
-      <div id="userTable" class="hidden">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Created At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% arr.forEach(user => { %>
-            <tr>
-              <td><%= user.name %></td>
-              <td><%= user.email %></td>
-              <td><%= user.role || 'user' %></td>
-              <td><%= new Date(user.createdAt).toLocaleString() %></td>
-              <td>
-                <!-- Edit Button -->
-                <a
-                  href="/edituser/<%= user._id %>"
-                  class="action-btn edit"
-                  title="Edit"
-                  style="text-decoration: none"
-                >
-                  <i class="fas fa-edit"></i>
-                </a>
-                <!-- Delete Button -->
-                <button
-                  class="action-btn delete"
-                  title="Delete"
-                  data-user-id="<%= user._id %>"
-                  onclick="deleteUser(this)"
-                >
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+          Add to Slider
+        </button>
       </div>
     </div>
 
-    <script type="module">
-      import showFunToast from "/js/toast.js";
+    <!-- Edit Position Modal -->
+    <div
+      id="editPositionModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: #1a1a1a;
+          margin: 10% auto;
+          padding: 20px;
+          width: 80%;
+          max-width: 400px;
+          border-radius: 12px;
+          position: relative;
+        "
+      >
+        <span
+          class="close-modal"
+          style="
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #fff;
+          "
+          >×</span
+        >
+        <h2 style="margin-bottom: 20px; color: #00eaff">
+          Edit Slider Position
+        </h2>
+        <div
+          class="position-controls"
+          style="display: flex; flex-direction: column; gap: 15px"
+        >
+          <label style="color: #fff">Position in Slider:</label>
+          <input
+            type="number"
+            id="sliderPosition"
+            min="1"
+            style="
+              padding: 10px;
+              background: rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              border-radius: 4px;
+              color: #fff;
+            "
+          />
+          <button
+            onclick="saveSliderPosition()"
+            style="
+              padding: 10px;
+              background: linear-gradient(to right, #00eaff, #00a8b5);
+              border: none;
+              border-radius: 4px;
+              color: #000;
+              font-weight: bold;
+              cursor: pointer;
+            "
+          >
+            Save Position
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
-      const contentHeading = document.getElementById("contentHeading");
-      const userTable = document.getElementById("userTable");
-      const addUserButton = document.getElementById("addUserButton");
-      const addMovieButton = document.getElementById("addMovieButton");
-      const movieDisplay = document.getElementById("movieDisplay");
-      const sliderMoviesDisplay = document.getElementById(
-        "sliderMoviesDisplay"
-      );
-      const addToSliderModal = document.getElementById("addToSliderModal");
-      const editPositionModal = document.getElementById("editPositionModal");
-      const sliderPositionModal = document.getElementById(
-        "sliderPositionModal"
-      );
-      const sliderPositionInput = document.getElementById(
-        "sliderPositionInput"
-      );
+  <!-- Add User Button (Shown only when Users table is visible) -->
+  <div id="addUserButton" class="hidden" style="margin: 20px 0">
+    <a
+      href="/adduser"
+      class="action-btn add-user"
+      title="Add User"
+      style="
+        text-decoration: none;
+        padding: 12px 25px;
+        background: linear-gradient(to right, #fff, #ccc);
+        color: #000;
+        border-radius: 8px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      "
+    >
+      <i class="fas fa-user-plus"></i> Add User
+    </a>
+  </div>
+  <!-- User Table (Initially Hidden) -->
+  <div id="userTable" class="hidden">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% arr.forEach(user => { %>
+        <tr>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <td><%= user.role || 'user' %></td>
+          <td><%= new Date(user.createdAt).toLocaleString() %></td>
+          <td>
+            <!-- Edit Button -->
+            <a
+              href="/edituser/<%= user._id %>"
+              class="action-btn edit"
+              title="Edit"
+              style="text-decoration: none"
+            >
+              <i class="fas fa-edit"></i>
+            </a>
+            <!-- Delete Button -->
+            <button
+              class="action-btn delete"
+              title="Delete"
+              data-user-id="<%= user._id %>"
+              onclick="deleteUser(this)"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-      let currentMovieId = null;
-      let selectedMovieId = null;
+<script type="module">
+  import showFunToast from "/js/toast.js";
 
-      // Sidebar navigation
-      sidebarLinks.forEach((link) => {
-        if (link.classList.contains("back-to-home")) return; // skip this one
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const entity = link.dataset.entity;
+  const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
+  const contentHeading = document.getElementById("contentHeading");
+  const userTable = document.getElementById("userTable");
+  const addUserButton = document.getElementById("addUserButton");
+  const addMovieButton = document.getElementById("addMovieButton");
+  const movieDisplay = document.getElementById("movieDisplay");
+  const castDisplay = document.getElementById("castDisplay");
+  const sliderMoviesDisplay = document.getElementById("sliderMoviesDisplay");
+  const addToSliderModal = document.getElementById("addToSliderModal");
+  const editPositionModal = document.getElementById("editPositionModal");
+  const sliderPositionModal = document.getElementById("sliderPositionModal");
+  const sliderPositionInput = document.getElementById("sliderPositionInput");
 
-          sidebarLinks.forEach((l) => l.classList.remove("active"));
-          link.classList.add("active");
+  let currentMovieId = null;
+  let selectedMovieId = null;
 
-          contentHeading.textContent = entity;
+  // Sidebar navigation
+  sidebarLinks.forEach((link) => {
+    if (link.classList.contains("back-to-home")) {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = "/";
+      });
+      return;
+    }
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const entity = link.dataset.entity;
 
-          userTable.classList.toggle("hidden", entity !== "Users");
-          addUserButton.classList.toggle("hidden", entity !== "Users");
-          addMovieButton.classList.toggle("hidden", entity !== "Movies");
-          movieDisplay.classList.toggle("hidden", entity !== "Movies");
-          sliderMoviesDisplay.classList.toggle(
-            "hidden",
-            entity !== "SliderMovies"
+      sidebarLinks.forEach((l) => l.classList.remove("active"));
+      link.classList.add("active");
+
+      contentHeading.textContent = entity;
+
+      userTable.classList.toggle("hidden", entity !== "Users");
+      addUserButton.classList.toggle("hidden", entity !== "Users");
+      addMovieButton.classList.toggle("hidden", entity !== "Movies");
+      movieDisplay.classList.toggle("hidden", entity !== "Movies");
+      castDisplay.classList.toggle("hidden", entity !== "Cast");
+      sliderMoviesDisplay.classList.toggle("hidden", entity !== "SliderMovies");
+    });
+  });
+
+  // Delete user
+  window.deleteUser = (btn) => {
+    const user_id = btn.getAttribute("data-user-id");
+
+    fetch(`/api/users/${user_id}`, { method: "DELETE" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (response.ok) {
+          showFunToast(
+            data.message || "✅ User deleted successfully!",
+            "linear-gradient(to right, #00eaff, #00a8b5)"
           );
-        });
+          setTimeout(() => (window.location.href = "/admin/:id"), 1000);
+        } else {
+          showFunToast(data.message || "❗ An error occurred.", "red");
+        }
+      })
+      .catch((error) => {
+        showFunToast(error.message || "❗ An error occurred.", "red");
+      });
+  };
+
+  // Delete movie
+  window.deleteMovie = (btn) => {
+    const movie_id = btn.getAttribute("data-movie-id");
+
+    fetch(`/api/movies/${movie_id}`, { method: "DELETE" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (response.ok) {
+          showFunToast(
+            data.message || "✅ Movie deleted successfully!",
+            "linear-gradient(to right, #00eaff, #00a8b5)"
+          );
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          showFunToast(data.message || "❗ An error occurred.", "red");
+        }
+      })
+      .catch((error) => {
+        showFunToast(error.message || "❗ An error occurred.", "red");
+      });
+  };
+
+  // Delete cast
+  window.deleteCast = (btn) => {
+    const cast_id = btn.getAttribute("data-cast-id");
+
+    fetch(`/api/cast/${cast_id}`, { method: "DELETE" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (response.ok) {
+          showFunToast(
+            data.message || "✅ Cast member deleted successfully!",
+            "linear-gradient(to right, #00eaff, #00a8b5)"
+          );
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          showFunToast(data.message || "❗ An error occurred.", "red");
+        }
+      })
+      .catch((error) => {
+        showFunToast(error.message || "❗ An error occurred.", "red");
+      });
+  };
+
+  // Open movie selection modal
+  document
+    .getElementById("addToSliderBtn")
+    .addEventListener("click", () => {
+      addToSliderModal.style.display = "block";
+    });
+
+  // Close modals
+  document.querySelectorAll(".close-modal").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      addToSliderModal.style.display = "none";
+      editPositionModal.style.display = "none";
+      sliderPositionModal.style.display = "none";
+    });
+  });
+
+  // Close modals on outside click
+  window.addEventListener("click", (e) => {
+    if (e.target === addToSliderModal)
+      addToSliderModal.style.display = "none";
+    if (e.target === editPositionModal)
+      editPositionModal.style.display = "none";
+    if (e.target === sliderPositionModal)
+      sliderPositionModal.style.display = "none";
+  });
+
+  // Open custom position modal
+  window.addToSlider = (movieId) => {
+    selectedMovieId = movieId;
+    sliderPositionInput.value = "";
+    sliderPositionModal.style.display = "block";
+  };
+
+  window.closeSliderPositionModal = () => {
+    sliderPositionModal.style.display = "none";
+    selectedMovieId = null;
+  };
+
+  // Submit position to API
+  window.confirmAddToSlider = async () => {
+    const position = sliderPositionInput.value;
+    if (!position || isNaN(position)) {
+      showFunToast("❗ Position must be a valid number", "red");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/slider/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ movieId: selectedMovieId, position }),
       });
 
-      // Delete user
-      window.deleteUser = (btn) => {
-        const user_id = btn.getAttribute("data-user-id");
+      const data = await response.json();
+      if (response.ok) {
+        showFunToast(
+          "✅ Movie added to slider successfully!",
+          "linear-gradient(to right, #00eaff, #00a8b5)"
+        );
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        showFunToast(data.message || "❗ An error occurred.", "red");
+      }
+    } catch (error) {
+      showFunToast(error.message || "❗ An error occurred.", "red");
+    } finally {
+      closeSliderPositionModal();
+    }
+  };
 
-        fetch(`/api/users/${user_id}`, { method: "DELETE" })
-          .then(async (response) => {
-            const data = await response.json();
-            if (response.ok) {
-              showFunToast(
-                data.message || "✅ User deleted successfully!",
-                "linear-gradient(to right, #00eaff, #00a8b5)"
-              );
-              setTimeout(() => (window.location.href = "/admin/:id"), 1000);
-            } else {
-              showFunToast(data.message || "❗ An error occurred.", "red");
-            }
-          })
-          .catch((error) => {
-            showFunToast(error.message || "❗ An error occurred.", "red");
-          });
-      };
+  // Edit position
+  window.editSliderPosition = (movieId) => {
+    currentMovieId = movieId;
+    editPositionModal.style.display = "block";
+  };
 
-      // Delete movie
-      window.deleteMovie = (btn) => {
-        const movie_id = btn.getAttribute("data-movie-id");
+  window.saveSliderPosition = async () => {
+    const position = document.getElementById("sliderPosition").value;
 
-        fetch(`/api/movies/${movie_id}`, { method: "DELETE" })
-          .then(async (response) => {
-            const data = await response.json();
-            if (response.ok) {
-              showFunToast(
-                data.message || "✅ Movie deleted successfully!",
-                "linear-gradient(to right, #00eaff, #00a8b5)"
-              );
-              setTimeout(() => window.location.reload(), 1000);
-            } else {
-              showFunToast(data.message || "❗ An error occurred.", "red");
-            }
-          })
-          .catch((error) => {
-            showFunToast(error.message || "❗ An error occurred.", "red");
-          });
-      };
-
-      // Open movie selection modal
-      document
-        .getElementById("addToSliderBtn")
-        .addEventListener("click", () => {
-          addToSliderModal.style.display = "block";
-        });
-
-      // Close modals
-      document.querySelectorAll(".close-modal").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          addToSliderModal.style.display = "none";
-          editPositionModal.style.display = "none";
-          sliderPositionModal.style.display = "none";
-        });
+    try {
+      const response = await fetch("/api/slider/position", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ movieId: currentMovieId, position }),
       });
 
-      // Close modals on outside click
-      window.addEventListener("click", (e) => {
-        if (e.target === addToSliderModal)
-          addToSliderModal.style.display = "none";
-        if (e.target === editPositionModal)
-          editPositionModal.style.display = "none";
-        if (e.target === sliderPositionModal)
-          sliderPositionModal.style.display = "none";
+      const data = await response.json();
+      if (response.ok) {
+        showFunToast(
+          "✅ Slider position updated successfully!",
+          "linear-gradient(to right, #00eaff, #00a8b5)"
+        );
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        showFunToast(data.message || "❗ An error occurred.", "red");
+      }
+    } catch (error) {
+      showFunToast(error.message || "❗ An error occurred.", "red");
+    }
+  };
+
+  // Remove from slider
+  window.removeFromSlider = async (movieId) => {
+    try {
+      const response = await fetch(`/api/slider/${movieId}`, {
+        method: "DELETE",
       });
+      const data = await response.json();
 
-      // Open custom position modal
-      window.addToSlider = (movieId) => {
-        selectedMovieId = movieId;
-        sliderPositionInput.value = "";
-        sliderPositionModal.style.display = "block";
-      };
+      if (response.ok) {
+        showFunToast(
+          "✅ Movie removed from slider successfully!",
+          "linear-gradient(to right, #00eaff, #00a8b5)"
+        );
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        showFunToast(data.message || "❗ An error occurred.", "red");
+      }
+    } catch (error) {
+      showFunToast(error.message || "❗ An error occurred.", "red");
+    }
+  };
 
-      window.closeSliderPositionModal = () => {
-        sliderPositionModal.style.display = "none";
-        selectedMovieId = null;
-      };
+  document.addEventListener("DOMContentLoaded", function () {
+    const addToSliderBtn = document.getElementById("addToSliderBtn");
+    const sliderMovies = document.querySelectorAll(".slider-movie");
 
-      // Submit position to API
-      window.confirmAddToSlider = async () => {
-        const position = sliderPositionInput.value;
-        if (!position || isNaN(position)) {
-          showFunToast("❗ Position must be a valid number", "red");
-          return;
-        }
-
-        try {
-          const response = await fetch("/api/slider/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ movieId: selectedMovieId, position }),
-          });
-
-          const data = await response.json();
-          if (response.ok) {
-            showFunToast(
-              "✅ Movie added to slider successfully!",
-              "linear-gradient(to right, #00eaff, #00a8b5)"
-            );
-            setTimeout(() => window.location.reload(), 1000);
-          } else {
-            showFunToast(data.message || "❗ An error occurred.", "red");
-          }
-        } catch (error) {
-          showFunToast(error.message || "❗ An error occurred.", "red");
-        } finally {
-          closeSliderPositionModal();
-        }
-      };
-
-      // Edit position
-      window.editSliderPosition = (movieId) => {
-        currentMovieId = movieId;
-        editPositionModal.style.display = "block";
-      };
-
-      window.saveSliderPosition = async () => {
-        const position = document.getElementById("sliderPosition").value;
-
-        try {
-          const response = await fetch("/api/slider/position", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ movieId: currentMovieId, position }),
-          });
-
-          const data = await response.json();
-          if (response.ok) {
-            showFunToast(
-              "✅ Slider position updated successfully!",
-              "linear-gradient(to right, #00eaff, #00a8b5)"
-            );
-            setTimeout(() => window.location.reload(), 1000);
-          } else {
-            showFunToast(data.message || "❗ An error occurred.", "red");
-          }
-        } catch (error) {
-          showFunToast(error.message || "❗ An error occurred.", "red");
-        }
-      };
-
-      // Remove from slider
-      window.removeFromSlider = async (movieId) => {
-        try {
-          const response = await fetch(`/api/slider/${movieId}`, {
-            method: "DELETE",
-          });
-          const data = await response.json();
-
-          if (response.ok) {
-            showFunToast(
-              "✅ Movie removed from slider successfully!",
-              "linear-gradient(to right, #00eaff, #00a8b5)"
-            );
-            setTimeout(() => window.location.reload(), 1000);
-          } else {
-            showFunToast(data.message || "❗ An error occurred.", "red");
-          }
-        } catch (error) {
-          showFunToast(error.message || "❗ An error occurred.", "red");
-        }
-      };
-
-      document.addEventListener("DOMContentLoaded", function () {
-        const addToSliderBtn = document.getElementById("addToSliderBtn");
-        const sliderMovies = document.querySelectorAll(".slider-movie");
-
-        // Check if there are already 3 movies in the slider
-        if (sliderMovies.length >= 3) {
-          addToSliderBtn.style.opacity = "0.5";
-          addToSliderBtn.style.pointerEvents = "none";
-        }
-      });
-    </script>
-  </body>
+    // Check if there are already 3 movies in the slider
+    if (sliderMovies.length >= 3) {
+      addToSliderBtn.style.opacity = "0.5";
+      addToSliderBtn.style.pointerEvents = "none";
+    }
+  });
+</script>
+</html>
 </html>
