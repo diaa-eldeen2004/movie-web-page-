@@ -18,10 +18,15 @@ import {
   get2fa,
   getAddMovie,
   getEditMovie,
-} from "../controllers/frontend.js"; // Import the getAdmin function
+  getAddCast, 
+  getEditCast,
+} from "../controllers/frontend.js";
 import { getWatchlist } from "../controllers/mylist.js";
 import { getMovieById } from "../controllers/movie.js";
+
 const router = express.Router();
+
+// Middleware to check for user authentication
 router.use(async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
@@ -38,6 +43,8 @@ router.use(async (req, res, next) => {
     next();
   }
 });
+
+// Existing routes
 router.get("/", getIndex);
 router.get("/contact", getcontact);
 router.get("/movies", getmovies);
@@ -55,5 +62,6 @@ router.get("/profile/:id", auth(["admin", "user"]), getprofile);
 router.get("/editmovie/:id", auth(["admin"]), getEditMovie);
 router.get("/edituser/:id", auth(["admin", "user"]), getEditUser);
 router.get("/movies/:id", getMovieById);
-
+router.get("/addcast", auth(["admin"]), getAddCast);
+router.get("/editcast/:id", auth(["admin"]), getEditCast);
 export default router;
