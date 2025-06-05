@@ -23,8 +23,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/slider", sliderRoutes);
-app.use("/mylist", mylistRoutes);
-app.use('/cast', castRoutes);
+app.use("/api/mylist", mylistRoutes);
+app.use('/api/cast', castRoutes);
 
 app.use((req, res) => {
   res.render("pages/404");
