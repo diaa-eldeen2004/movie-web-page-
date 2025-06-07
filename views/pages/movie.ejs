@@ -49,6 +49,7 @@
           <% } %>
           <div class="description mt-4" style="font-size: 1.15rem; color: #e6e6e6; line-height: 1.7; max-width: 700px;"> <%= movie.description %> </div>
         </div>
+
         <!-- Poster and info on the right -->
         <div class="d-flex flex-column align-items-center w-100" style="max-width: 340px; min-width: 260px;">
           <img
@@ -64,6 +65,27 @@
             <span><i class="fa-solid fa-film"></i> <%= movie.genre.join(', ') %></span>
             <span><i class="fa-solid fa-star"></i> <span style='color:#f5c518'><%= movie.rating %></span>/10</span>
           </div>
+
+          <!-- Cast Circle Cards -->
+          <% if (movie.cast && movie.cast.length > 0) { %>
+            <div class="cast-section mt-4 w-100 text-center">
+              <h4 class="text-light mb-3">Cast</h4>
+              <div class="d-flex flex-wrap justify-content-center gap-3">
+                <% movie.cast.forEach(castMember => { %>
+                  <div class="cast-card text-center" style="width: 80px;">
+                    <img
+                      src="<%= castMember.photoURL %>"
+                      alt="<%= castMember.name %>"
+                      class="rounded-circle mb-2"
+                      style="width: 70px; height: 70px; object-fit: cover; border: 2px solid #f5c518;"
+                    />
+                    <small class="text-light d-block" style="font-size: 0.85rem;"><%= castMember.name %></small>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
+          <% } %>
+
           <% if (user) { %>
           <div class="my-2 text-center">
             <button 
@@ -103,9 +125,9 @@
       </section>
     <% } %>
 
-    <div id="comments-section">
-      <h3>User Reviews</h3>
-      <div id="comments-list"></div>
+    <div id="comments-section" class="container my-5">
+      <h3 class="text-light">User Reviews</h3>
+      <div id="comments-list" class="mb-3"></div>
       <% if (user) { %>
         <form id="commentForm">
           <textarea name="text" required placeholder="Write your review..."></textarea>
@@ -117,71 +139,69 @@
       <% } %>
     </div>
 
+    <!-- Footer -->
+    <%- include('../partials/footer.ejs') %>
 
-  <!-- Footer -->
-  <%- include('../partials/footer.ejs') %>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="/js/script.js"></script>
 
-  <!-- Custom JS -->
-  <script type="module" src="/js/script.js"></script>
+    <script type="module">
+      import showFunToast from "/js/toast.js";
 
-  <script type="module">
-        import showFunToast from "/js/toast.js";
+      document.querySelectorAll(".save-to-list").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const movieId = btn.dataset.movieId;
+          try {
+            const res = await fetch(`/api/mylist/${movieId}`, {
+              method: "POST",
+              credentials: "include",
+            });
+            const data = await res.json();
 
-document.querySelectorAll(".save-to-list").forEach((btn) => {
-  btn.addEventListener("click", async (e) => {
-    const movieId = btn.dataset.movieId;
-    try {
-      const res = await fetch(`/api/mylist/${movieId}`, {
-        method: "POST",
-        credentials: "include", // to send cookies/session
+            if (res.ok) {
+              showFunToast(data.message || "✅ Movie added to your list!", "linear-gradient(to right, #00eaff, #00a8b5)");
+            } else {
+              showFunToast(data.message || "❗ Couldn't add movie.", "red");
+            }
+          } catch (err) {
+            showFunToast("❗ Network error", "red");
+          }
+        });
       });
-      const data = await res.json();
 
-      if (res.ok) {
-        showFunToast(data.message || "✅ Movie added to your list!", "linear-gradient(to right, #00eaff, #00a8b5)");
-      } else {
-        showFunToast(data.message || "❗ Couldn't add movie.", "red");
+      const movieId = "<%= movie._id %>";
+
+      async function loadComments() {
+        const res = await fetch(`/api/comments/movie/${movieId}`);
+        const comments = await res.json();
+        const list = document.getElementById("comments-list");
+        list.innerHTML = comments
+          .map(c => `<div><strong>${c.user.name}</strong> rated ${c.rating}/10<br>${c.text}</div>`)
+          .join("");
       }
-    } catch (err) {
-      showFunToast("❗ Network error", "red");
-    }
-  });
-});
 
+      document.getElementById("commentForm")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const text = form.text.value.trim();
+        const rating = parseInt(form.rating.value);
 
-const movieId = "<%= movie._id %>";
+        const res = await fetch(`/api/comments/${movieId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ text, rating }),
+        });
 
-  async function loadComments() {
-    const res = await fetch(`/api/comments/movie/${movieId}`);
-    const comments = await res.json();
-    const list = document.getElementById("comments-list");
-    list.innerHTML = comments
-      .map(c => `<div><strong>${c.user.name}</strong> rated ${c.rating}/10<br>${c.text}</div>`)
-      .join("");
-  }
+        const data = await res.json();
+        showFunToast(data.message || "✅ Comment added", "linear-gradient(to right, #00eaff, #00a8b5)");
+        loadComments();
+      });
 
-  document.getElementById("commentForm")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const text = form.text.value.trim();
-    const rating = parseInt(form.rating.value);
-
-    const res = await fetch(`/api/comments/${movieId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ text, rating }),
-    });
-
-    const data = await res.json();
-    showFunToast(data.message || "✅ Comment added", "linear-gradient(to right, #00eaff, #00a8b5)");
-    loadComments();
-  });
-
-  loadComments();
-      </script>
+      loadComments();
+    </script>
   </body>
 </html>
