@@ -62,8 +62,8 @@ export const getprofile = async (req, res) => {
 // Render the series page
 export const getALLCasts = async (req, res) => {
   try {
-    const [sliderCast, trendingMovies, allCast] = await Promise.all([
-      CastModel.find({ isFeatured: true }).sort({ featuredOrder: 1 }).limit(3), // Assuming isFeatured and featuredOrder fields
+    const [sliderCasts, trendingMovies, allCast] = await Promise.all([
+      CastModel.find({ isFeatured: true }).sort({ featuredOrder: 1 }).limit(3), // Fixed variable name from sliderCast to sliderCasts
       MovieModel.find({ category: "trending" }),
       CastModel.find(),
     ]);
@@ -80,7 +80,7 @@ export const getALLCasts = async (req, res) => {
     });
 
     res.render("pages/casts", {
-      sliderCast,
+      sliderCasts, // Corrected variable name matches template expectation
       trendingCasts,
       bornToday,
       allCast,
@@ -115,12 +115,14 @@ export const getsettings = (req, res) => {
 // Render the admin dashboard
 export const getAdmin = async (req, res) => {
   try {
+
     const [users, allMovies, sliderMovies, allCast, allComments] = await Promise.all([
       UserModel.find(),
       MovieModel.find(),
       MovieModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }),
       CastModel.find(),
       Comment.find().populate("user movie", "name title"),
+
     ]);
 
     res.render("admin/admin", {
@@ -129,6 +131,8 @@ export const getAdmin = async (req, res) => {
       sliderMovies,
       Cast: allCast,
       Comments: allComments,
+      sliderCasts,
+
     });
   } catch (err) {
     console.error("Error loading admin page:", err);
@@ -187,8 +191,8 @@ export const getAddCast = (req, res) => {
   res.render('admin/addcast');
 };
 
-
-export const getEditCast= async (req, res) => {
+// Render the edit cast page
+export const getEditCast = async (req, res) => {
   try {
     const cast = await CastModel.findById(req.params.id).populate("movies", "title"); // or "title" depending on your schema
     if (!cast) {
@@ -197,8 +201,7 @@ export const getEditCast= async (req, res) => {
 
     res.render("admin/editcast", { cast });
   } catch (err) {
-    console.error("Error fetching user:", err);
+    console.error("Error fetching cast:", err);
     res.status(500).send("Internal Server Error");
   }
 };
-
