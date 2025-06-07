@@ -1,6 +1,7 @@
 import UserModel from "../models/user.js";
 import MovieModel from "../models/movie.js";
 import CastModel from "../models/cast.js";
+import Comment from "../models/comment.js";
 
 // Render the homepage with slider, trending, and new release movies
 export const getIndex = async (req, res) => {
@@ -114,12 +115,14 @@ export const getsettings = (req, res) => {
 // Render the admin dashboard
 export const getAdmin = async (req, res) => {
   try {
-    const [users, allMovies, sliderMovies, allCast, sliderCasts] = await Promise.all([
+
+    const [users, allMovies, sliderMovies, allCast, allComments] = await Promise.all([
       UserModel.find(),
       MovieModel.find(),
-      MovieModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }), 
+      MovieModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }),
       CastModel.find(),
-      CastModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }), // Fetch slider casts
+      Comment.find().populate("user movie", "name title"),
+
     ]);
 
     res.render("admin/admin", {
@@ -127,7 +130,9 @@ export const getAdmin = async (req, res) => {
       Movie: allMovies,
       sliderMovies,
       Cast: allCast,
+      Comments: allComments,
       sliderCasts,
+
     });
   } catch (err) {
     console.error("Error loading admin page:", err);
