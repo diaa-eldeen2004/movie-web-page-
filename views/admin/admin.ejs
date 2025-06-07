@@ -321,6 +321,7 @@
           ><i class="fas fa-sliders-h"></i> Slider Casts</a
         >
         <a href="#" data-entity="Users"><i class="fas fa-users"></i> Users</a>
+        <a href="#" data-entity="Comments"><i class="fas fa-comments"></i> Comments</a>
         <a href="/" class="back-to-home" onclick="goToIndex()"
           ><i class="fas fa-home"></i> Back to YMD</a
         >
@@ -1223,6 +1224,49 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Comments Table (Initially Hidden) -->
+      <div id="commentsTable" class="hidden">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Movie</th>
+              <th>Content</th>
+              <th>Rating</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (typeof Comments !== 'undefined' && Comments.length > 0) { %>
+              <% Comments.forEach(comment => { %>
+                <tr>
+                  <td><%= comment.userName || (comment.user && comment.user.name) || 'Unknown' %></td>
+                  <td><%= comment.movieTitle || (comment.movie && comment.movie.title) || 'Unknown' %></td>
+                  <td><%= comment.text %></td>
+                  <td><%= comment.rating != null ? comment.rating : '-' %></td>
+                  <td><%= new Date(comment.createdAt).toLocaleString() %></td>
+                  <td>
+                    <button
+                      class="action-btn delete"
+                      title="Delete"
+                      data-comment-id="<%= comment._id %>"
+                      onclick="deleteComment(this)"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" style="text-align:center; color:rgba(255,255,255,0.5)">No comments yet</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <script type="module">
@@ -1245,6 +1289,7 @@
       const editCastPositionModal = document.getElementById("editCastPositionModal");
       const sliderPositionInput = document.getElementById("sliderPositionInput");
       const castSliderPositionInput = document.getElementById("castSliderPositionInput");
+      const commentsTable = document.getElementById("commentsTable");
 
       let currentMovieId = null;
       let selectedMovieId = null;
@@ -1276,6 +1321,7 @@
           castDisplay.classList.toggle("hidden", entity !== "Cast");
           sliderMoviesDisplay.classList.toggle("hidden", entity !== "SliderMovies");
           sliderCastsDisplay.classList.toggle("hidden", entity !== "SliderCasts");
+          commentsTable.classList.toggle("hidden", entity !== "Comments");
         });
       });
 
@@ -1333,6 +1379,27 @@
             if (response.ok) {
               showFunToast(
                 data.message || "✅ Cast member deleted successfully!",
+                "linear-gradient(to right, #00eaff, #00a8b5)"
+              );
+              setTimeout(() => window.location.reload(), 1000);
+            } else {
+              showFunToast(data.message || "❗ An error occurred.", "red");
+            }
+          })
+          .catch((error) => {
+            showFunToast(error.message || "❗ An error occurred.", "red");
+          });
+      };
+
+      // Delete comment
+      window.deleteComment = (btn) => {
+        const comment_id = btn.getAttribute("data-comment-id");
+        fetch(`/api/comments/${comment_id}`, { method: "DELETE" })
+          .then(async (response) => {
+            const data = await response.json();
+            if (response.ok) {
+              showFunToast(
+                data.message || "✅ Comment deleted successfully!",
                 "linear-gradient(to right, #00eaff, #00a8b5)"
               );
               setTimeout(() => window.location.reload(), 1000);

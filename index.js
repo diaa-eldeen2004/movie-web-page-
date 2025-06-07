@@ -9,6 +9,7 @@ import movieRoutes from "./routes/movie.js";
 import sliderRoutes from "./routes/slider.js";
 import mylistRoutes from "./routes/mylist.js";
 import castRoutes from './routes/cast.js';
+import commentRoutes from "./routes/comment.js";
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use("/api/movies", movieRoutes);
 app.use("/api/slider", sliderRoutes);
 app.use("/api/mylist", mylistRoutes);
 app.use('/api/cast', castRoutes);
+app.use("/api/comments", commentRoutes);
+
 
 app.use((req, res) => {
   res.render("pages/404");
