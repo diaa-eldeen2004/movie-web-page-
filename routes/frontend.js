@@ -8,7 +8,7 @@ import {
   getlogin,
   getmovies,
   getprofile,
-  getseries,
+  getALLCasts,
   getsignup,
   getsettings,
   getAdmin,
@@ -49,7 +49,7 @@ router.get("/", getIndex);
 router.get("/contact", getcontact);
 router.get("/movies", getmovies);
 router.get("/mylist", auth(), getWatchlist);
-router.get("/series", getseries);
+router.get("/casts", getALLCasts);
 router.get("/settings", getsettings);
 router.get("/login", getlogin);
 router.get("/signup", getsignup);

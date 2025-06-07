@@ -59,8 +59,36 @@ export const getprofile = async (req, res) => {
 };
 
 // Render the series page
-export const getseries = (req, res) => {
-  res.render("pages/series");
+export const getALLCasts = async (req, res) => {
+  try {
+    const [sliderCast, trendingMovies, allCast] = await Promise.all([
+      CastModel.find({ isFeatured: true }).sort({ featuredOrder: 1 }).limit(3), // Assuming isFeatured and featuredOrder fields
+      MovieModel.find({ category: "trending" }),
+      CastModel.find(),
+    ]);
+
+    // Get trending casts (cast members in trending movies)
+    const trendingCastIds = trendingMovies.flatMap(movie => movie.cast || []); // Adjust based on your schema
+    const trendingCasts = allCast.filter(cast => trendingCastIds.includes(cast._id.toString()));
+
+    // Filter born today (dynamic current date)
+    const today = new Date();
+    const bornToday = allCast.filter(cast => {
+      const birthDate = new Date(cast.birthdate);
+      return birthDate.getDate() === today.getDate() && birthDate.getMonth() === today.getMonth();
+    });
+
+    res.render("pages/casts", {
+      sliderCast,
+      trendingCasts,
+      bornToday,
+      allCast,
+      user: req.user, // Assuming user is attached to request
+    });
+  } catch (err) {
+    console.error("Failed to load cast page:", err);
+    res.status(500).send("Server Error");
+  }
 };
 
 // Render the signup page
