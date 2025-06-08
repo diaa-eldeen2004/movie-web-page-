@@ -1,5 +1,7 @@
 import Movie from "../models/movie.js";
+import Cast from "../models/cast.js";
 
+// Create a new movie
 export const createMovie = async (req, res) => {
   try {
     const {
@@ -8,42 +10,60 @@ export const createMovie = async (req, res) => {
       duration,
       rating,
       genre,
-      cast,
+      cast, // array of { name: "Actor Name" }
       description,
       posterURL,
       trailerURL,
       category,
     } = req.body;
 
-    if (!title || !releasedate || !duration || !rating || !genre || !cast || !description || !posterURL || !trailerURL ||!category) {
+    if (!title || !releasedate || !duration || !rating || !genre || !cast || !description || !posterURL || !trailerURL || !category) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    if (!Array.isArray(cast) || cast.some(actor => !actor.name)) {
+      return res.status(400).json({ error: "Cast must be an array of objects with a 'name' field." });
+    }
 
+    const castIds = await Promise.all(
+      cast.map(async (actor) => {
+        let existing = await Cast.findOne({ name: actor.name });
+        if (!existing) {
+          existing = new Cast({
+            name: actor.name,
+            birthdate: new Date(), // Placeholder
+            nationality: "Unknown",
+            description: "No description provided.",
+            profileImageURL: "https://default-profile.com/image.jpg",
+          });
+          await existing.save();
+        }
+        return existing._id;
+      })
+    );
 
-    // Create a new movie document
     const movie = new Movie({
       title,
       releasedate,
       duration,
       rating,
-      genre ,
-      cast,
+      genre,
+      cast: castIds,
       description,
       posterURL,
       trailerURL,
-      category,  // Corrected the typo here
+      category,
     });
 
-    // Save the movie to the database
     await movie.save();
-    res.status(201).json(movie); // Respond with the created movie
+    res.status(201).json(movie);
   } catch (err) {
     console.error("Error creating movie:", err);
     res.status(500).json({ error: "Failed to create movie", details: err.message });
   }
 };
 
+// Update a movie
 export const updateMovie = async (req, res) => {
   try {
     const {
@@ -59,66 +79,64 @@ export const updateMovie = async (req, res) => {
       category,
     } = req.body;
 
-    // Validate required fields
-    if (
-      !title ||
-      !releasedate ||
-      !duration ||
-      !rating ||
-      !genre ||
-      !description||
-      !posterURL||
-      !trailerURL||
-      !category
-    ) {
+    if (!title || !releasedate || !duration || !rating || !genre || !cast || !description || !posterURL || !trailerURL || !category) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
-    // Ensure genre is an array
     if (!Array.isArray(genre)) {
       return res.status(400).json({ message: "Genre must be an array." });
     }
 
-    // Ensure cast is an array of objects with 'name'
-    if (!Array.isArray(cast) || cast.some((actor) => !actor.name)) {
-      return res
-        .status(400)
-        .json({ message: "Cast must be an array of objects with a 'name' field." });
+    if (!Array.isArray(cast) || cast.some(actor => !actor.name)) {
+      return res.status(400).json({ message: "Cast must be an array of objects with a 'name' field." });
     }
 
-    const updatedData = {
-      title,
-      releasedate,
-      duration,
-      rating,
-      genre,
-      cast,
-      description,
-      posterURL,
-      trailerURL,
-      category,
-    };
+    const castIds = await Promise.all(
+      cast.map(async (actor) => {
+        let existing = await Cast.findOne({ name: actor.name });
+        if (!existing) {
+          existing = new Cast({
+            name: actor.name,
+            birthdate: new Date(),
+            nationality: "Unknown",
+            description: "No description provided.",
+            profileImageURL: "https://default-profile.com/image.jpg",
+          });
+          await existing.save();
+        }
+        return existing._id;
+      })
+    );
 
-    const movie = await Movie.findByIdAndUpdate(req.params.id, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        releasedate,
+        duration,
+        rating,
+        genre,
+        cast: castIds,
+        description,
+        posterURL,
+        trailerURL,
+        category,
+      },
+      { new: true, runValidators: true }
+    );
 
-    if (!movie) {
+    if (!updatedMovie) {
       return res.status(404).json({ message: "Movie not found." });
     }
 
-    res.status(200).json(movie);
+    res.status(200).json(updatedMovie);
   } catch (err) {
     console.error("Update error:", err);
-    res.status(500).json({ message: "Failed to update movie.", details: err });
+    res.status(500).json({ message: "Failed to update movie.", details: err.message });
   }
 };
 
-
-
-
-// DELETE /movies/:id
+// Delete a movie
 export const deleteMovie = async (req, res) => {
   try {
     const movie = await Movie.findByIdAndDelete(req.params.id);
@@ -130,24 +148,27 @@ export const deleteMovie = async (req, res) => {
   }
 };
 
+// Get movie by ID (with populated cast and related movies)
 export const getMovieById = async (req, res) => {
   try {
-    const movie = await Movie.findById(req.params.id);
+    // Find movie and populate cast details
+    const movie = await Movie.findById(req.params.id).populate("cast");
 
     if (!movie) {
-      return res.status(404).send('Movie not found');
+      return res.status(404).send("Movie not found");
     }
 
-    // Get related movies (same genre, exclude current)
+    // Find related movies by shared genre
     const relatedMovies = await Movie.find({
-      _id: { $ne: movie._id }, // exclude current movie
-      genre: { $in: movie.genre } // same genre
-    }).limit(6); // limit for display
+      _id: { $ne: movie._id },
+      genre: { $in: movie.genre },
+    }).limit(6);
 
-    res.render('pages/movie', { movie, relatedMovies });
+    // Render movie page with movie and related movies
+    res.render("pages/movie", { movie, relatedMovies });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    console.error("Error fetching movie:", err);
+    res.status(500).send("Server Error");
   }
-  
 };
+

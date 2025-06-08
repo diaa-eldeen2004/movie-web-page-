@@ -304,3 +304,34 @@ export const updateCastSliderPosition = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+export const getCastDetail = async (req, res) => {
+  try {
+    const castId = req.params.id;
+    const [cast, allCasts] = await Promise.all([
+      CastModel.findById(castId).populate('movies', 'title posterURL'), // Populate movies with title and posterURL
+      MovieModel.find(), // Fetch all movies for potential related content
+      CastModel.find(), // Fetch all casts for related casts
+    ]);
+
+    if (!cast) {
+      return res.status(404).send("Cast member not found");
+    }
+
+    // Find related casts (e.g., those who share movies with this cast member)
+    const relatedMovieIds = cast.movies.map(movie => movie._id.toString());
+    const relatedCasts = allCasts.filter(c => 
+      c._id.toString() !== castId && // Exclude the current cast
+      c.movies.some(movie => relatedMovieIds.includes(movie._id.toString()))
+    ).slice(0, 8); // Limit to 8 related casts
+
+    res.render("pages/cast", {
+      cast, // Cast member data
+      relatedCasts, // Related cast members for "You May Like"
+    });
+  } catch (err) {
+    console.error("Error fetching cast detail:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
