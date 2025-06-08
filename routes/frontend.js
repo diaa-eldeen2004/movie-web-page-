@@ -48,7 +48,7 @@ router.use(async (req, res, next) => {
 router.get("/", getIndex);
 router.get("/contact", getcontact);
 router.get("/movies", getmovies);
-router.get("/mylist", auth(), getWatchlist);
+router.get("/mylist", getWatchlist);
 router.get("/casts", getALLCasts);
 router.get("/settings", getsettings);
 router.get("/login", getlogin);
