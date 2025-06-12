@@ -165,7 +165,7 @@ export const getMovieById = async (req, res) => {
     }).limit(6);
 
     // Render movie page with movie and related movies
-    res.render("pages/movie", { movie, relatedMovies });
+    res.render("pages/movie", { movie, relatedMovies, user: res.locals.user });
   } catch (err) {
     console.error("Error fetching movie:", err);
     res.status(500).send("Server Error");

@@ -179,9 +179,38 @@
         const comments = await res.json();
         const list = document.getElementById("comments-list");
         list.innerHTML = comments
-          .map(c => `<div><strong>${c.user.name}</strong> rated ${c.rating}/10<br>${c.text}</div>`)
-          .join("");
+          .map(c => {
+    const isOwner = c.user._id === "<%= user?.id %>"; // Only show delete button for comment owner
+    return `
+      <div class="comment-box mb-3 p-2 border rounded text-light" style="background:#222;">
+        <strong>${c.user.name}</strong> rated ${c.rating}/10
+        <p>${c.text}</p>
+        ${isOwner ? `<button class="btn btn-sm btn-danger delete-comment-btn" data-id="${c._id}"><i class="fas fa-trash"></i> Delete</button>` : ''}
+      </div>`;
+  })
+  .join("");
       }
+      
+      document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("delete-comment-btn")) {
+    const commentId = e.target.dataset.id;
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showFunToast(data.message || "✅ Comment deleted", "green");
+        loadComments();
+      } else {
+        showFunToast(data.message || "❗ Error deleting comment", "red");
+      }
+    } catch (err) {
+      showFunToast("❗ Network error", "red");
+    }
+  }
+});
 
       document.getElementById("commentForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
