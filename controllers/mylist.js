@@ -36,3 +36,19 @@ export const getWatchlist = async (req, res) => {
     res.status(500).send("Error loading your list.");
   }
 };
+
+export const deleteFromWatchlist = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const movieId = req.params.movieId;
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { watchlist: movieId }
+    });
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Error removing movie from watchlist:', error);
+    res.sendStatus(500);
+  }
+};

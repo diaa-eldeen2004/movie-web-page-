@@ -33,11 +33,6 @@ export const getmovies = (req, res) => {
   res.render("pages/movies");
 };
 
-// Render the mylist page
-export const getmylist = (req, res) => {
-  res.render("pages/mylist");
-};
-
 // Render the forget password page
 export const getfrogetpassword = (req, res) => {
   res.render("pages/forgetpassword");
