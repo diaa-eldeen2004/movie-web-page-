@@ -11,6 +11,7 @@ import mylistRoutes from "./routes/mylist.js";
 import castRoutes from './routes/cast.js';
 import commentRoutes from "./routes/comment.js";
 import favoriteRoutes from "./routes/favorite.js";
+import searchRoutes from "./routes/search.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/mylist", mylistRoutes);
 app.use('/api/cast', castRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/favorites", favoriteRoutes);
+app.use("/api/search", searchRoutes);
 
 app.use((req, res) => {
   res.render("pages/404");
