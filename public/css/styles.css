@@ -833,6 +833,176 @@ body {
   background: linear-gradient(to right, #ffe082, #f5c518);
 }
 
-/* ...existing code... */
+/* Footer Styles */
+.footer {
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 100%);
+  padding: 3rem 0;
+  margin-top: 4rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.footer-content p {
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.follow-us {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.follow-us p {
+  margin: 0;
+}
+
+.follow-us a {
+  color: rgba(255,255,255,0.7);
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.follow-us a:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 2rem 0;
+  }
+
+  .footer-content {
+    padding: 0 1rem;
+    gap: 1.5rem;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .follow-us {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Sticky Button Styles */
+.sticky-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: linear-gradient(to right, #f5c518, #ffecb3);
+  color: #181818;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.sticky-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(245, 197, 24, 0.4);
+  background: linear-gradient(to right, #ffe082, #f5c518);
+}
+
+.sticky-button:active {
+  transform: scale(0.95);
+}
+
+/* Optional: Add a label to the sticky button */
+.sticky-button::before {
+  content: attr(data-label);
+  position: absolute;
+  right: 70px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sticky-button:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Optional: Add a pulse animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 197, 24, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(245, 197, 24, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 197, 24, 0);
+  }
+}
+
+.sticky-button.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sticky-button {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .sticky-button::before {
+    display: none;
+  }
+}
 
 

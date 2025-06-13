@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Favorites - Movie Website</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="/css/favorites.css" />
+  </head>
+  <body>
+    <%- include("../partials/navbar") %>
+
+    <div class="favorites-container">
+      <div class="container">
+        <h1 class="page-title">My Favorites</h1>
+
+        <% if (favoriteCasts && favoriteCasts.length > 0) { %>
+          <div class="cast-grid">
+            <% favoriteCasts.forEach((cast) => { %>
+              <div class="cast-card">
+                <img
+                  src="<%= cast.profileImageURL %>"
+                  alt="<%= cast.name %>"
+                  class="cast-image"
+                />
+                <div class="cast-info">
+                  <h3 class="cast-name"><%= cast.name %></h3>
+                  <div class="cast-details">
+                    <div class="cast-detail">
+                      <i class="fas fa-birthday-cake"></i>
+                      <span><%= new Date(cast.birthdate).toLocaleDateString() %></span>
+                    </div>
+                    <div class="cast-detail">
+                      <i class="fas fa-map-marker-alt"></i>
+                      <span><%= cast.nationality %></span>
+                    </div>
+                    <div class="cast-detail">
+                      <i class="fas fa-film"></i>
+                      <span><%= cast.movies ? cast.movies.length : 0 %> Movies</span>
+                    </div>
+                  </div>
+                  <div class="cast-actions">
+                    <a href="/cast/<%= cast._id %>" class="view-btn">View Details</a>
+                    <button
+                      class="remove-btn"
+                      data-cast-id="<%= cast._id %>"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <i class="fas fa-heart-broken"></i>
+            <h2>No Favorites Yet</h2>
+            <p>You haven't added any casts to your favorites yet.</p>
+            <a href="/casts" class="browse-btn">Browse Casts</a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const removeButtons = document.querySelectorAll('.remove-btn');
+        
+        removeButtons.forEach(button => {
+          button.addEventListener('click', async function() {
+            const castId = this.dataset.castId;
+            
+            try {
+              const response = await fetch(`/api/favorites/remove/${castId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              });
+              
+              const data = await response.json();
+              
+              if (response.ok) {
+                this.closest('.cast-card').remove();
+                
+                const toast = Toastify({
+                  text: "Cast removed from favorites",
+                  duration: 3000,
+                  gravity: "bottom",
+                  position: "right",
+                  style: {
+                    background: "#dc3545",
+                  }
+                });
+                toast.showToast();
+                
+                const remainingCards = document.querySelectorAll('.cast-card');
+                if (remainingCards.length === 0) {
+                  location.reload();
+                }
+              } else {
+                const toast = Toastify({
+                  text: data.error || "Failed to remove from favorites",
+                  duration: 3000,
+                  gravity: "bottom",
+                  position: "right",
+                  style: {
+                    background: "#dc3545",
+                  }
+                });
+                toast.showToast();
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              const toast = Toastify({
+                text: "Failed to remove from favorites",
+                duration: 3000,
+                gravity: "bottom",
+                position: "right",
+                style: {
+                  background: "#dc3545",
+                }
+              });
+              toast.showToast();
+            }
+          });
+        });
+      });
+    </script>
+    <script type="module" src="/js/script.js"></script>
+  </body>
+</html> 

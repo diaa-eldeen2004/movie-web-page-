@@ -31,7 +31,7 @@ export const createCast = async (req, res) => {
 
       movieIds = matchedMovies.map((movie) => movie._id);
 
-      if (movieIds.length === 0) {
+      if (movieIds.length === 0 && movies.length > 0) {
         return res.status(404).json({ error: "No matching movies found" });
       }
     }
@@ -47,20 +47,18 @@ export const createCast = async (req, res) => {
 
     await cast.save();
 
-    // Add cast name to each movie's cast list
+    // Add cast to each movie's cast list
     if (movieIds.length > 0) {
       await Movie.updateMany(
         { _id: { $in: movieIds } },
-        { $addToSet: { cast: { name: cast.name } } }
+        { $addToSet: { cast: cast._id } }
       );
     }
 
-    res.status(201).json(cast);
+    res.status(201).json({ message: "Cast member created successfully", cast });
   } catch (err) {
     console.error("Error creating cast:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to create cast", details: err.message });
+    res.status(500).json({ error: "Failed to create cast", details: err.message });
   }
 };
 
@@ -147,25 +145,35 @@ export const updateCast = async (req, res) => {
 
 export const deleteCast = async (req, res) => {
   try {
-    const cast = await Cast.findByIdAndDelete(req.params.id);
+    const castId = req.params.id;
+    
+    if (!castId) {
+      return res.status(400).json({ error: "Cast ID is required" });
+    }
+
+    const cast = await Cast.findById(castId);
     if (!cast) {
       return res.status(404).json({ error: "Cast member not found" });
     }
 
+    // Get all movies that reference this cast
+    const moviesWithCast = await Movie.find({ cast: castId });
+
+    // Remove cast from all movies
     await Movie.updateMany(
-      { "cast.name": cast.name },
-      { $pull: { cast: { name: cast.name } } }
+      { cast: castId },
+      { $pull: { cast: castId } }
     );
 
-    res.json({ message: "Cast member deleted successfully" });
+    // Delete the cast
+    await Cast.findByIdAndDelete(castId);
+
+    res.status(200).json({ message: "Cast member deleted successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to delete cast" });
+    console.error("Error deleting cast:", err);
+    res.status(500).json({ error: "Failed to delete cast", details: err.message });
   }
 };
-
-
-
 
 export const addCastToSlider = async (req, res) => {
   try {
@@ -305,14 +313,13 @@ export const updateCastSliderPosition = async (req, res) => {
   }
 };
 
-
 export const getCastDetail = async (req, res) => {
   try {
     const castId = req.params.id;
     const [cast, allCasts] = await Promise.all([
-      CastModel.findById(castId).populate('movies', 'title posterURL'), // Populate movies with title and posterURL
-      MovieModel.find(), // Fetch all movies for potential related content
-      CastModel.find(), // Fetch all casts for related casts
+      Cast.findById(castId).populate('movies', 'title posterURL'), // Populate movies with title and posterURL
+      Movie.find(), // Fetch all movies for potential related content
+      Cast.find(), // Fetch all casts for related casts
     ]);
 
     if (!cast) {
@@ -326,7 +333,7 @@ export const getCastDetail = async (req, res) => {
       c.movies.some(movie => relatedMovieIds.includes(movie._id.toString()))
     ).slice(0, 8); // Limit to 8 related casts
 
-    res.render("pages/cast", {
+    res.render("pages/singlecast", {
       cast, // Cast member data
       relatedCasts, // Related cast members for "You May Like"
     });
