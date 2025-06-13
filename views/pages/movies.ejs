@@ -97,13 +97,11 @@
           </select>
           <select id="timeSelect" class="form-select mb-2">
             <option value="">Select Time Period</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-            <option value="2022">2022</option>
-            <option value="2021">2021</option>
-            <option value="2020">2020</option>
+            <option value="recent">Recent (2020 - Present)</option>
+            <option value="2010s">2010s (2010 - 2019)</option>
+            <option value="classic">Classic (Before 2010)</option>
           </select>
-          <button onclick="searchMovies()" class="btn btn-primary w-100">Search</button>
+          <button onclick="get_movie_recommendation()" class="btn btn-primary w-100">Search</button>
         </div>
       </div>
       <div id="recommendationResults" class="recommendation-results">
@@ -121,57 +119,67 @@
       function toggleRecommendationChat() {
         const chat = document.getElementById('recommendationChat');
         chat.classList.toggle('active');
+        if (chat.classList.contains('active')) {
+          get_movie_recommendation();
+        }
       }
 
       document.getElementById('recommendationBtn').addEventListener('click', toggleRecommendationChat);
 
-      async function searchMovies() {
+      async function get_movie_recommendation() {
         const genre = document.getElementById('genreSelect').value;
         const time = document.getElementById('timeSelect').value;
         
         if (!genre || !time) {
-          alert('Please select both genre and time period');
+          showfun('Please select both genre and time period', 'error');
           return;
         }
 
         try {
-          const response = await fetch(`/api/movies/recommend?genre=${genre}&year=${time}`);
-          const movies = await response.json();
+          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch recommendations');
+          }
+
+          const movie = await response.json();
           
           const resultsDiv = document.getElementById('recommendationResults');
           resultsDiv.innerHTML = '';
 
-          if (movies.length === 0) {
-            resultsDiv.innerHTML = '<p class="text-center">No movies found matching your criteria.</p>';
+          if (!movie) {
+            showfun('No movies found matching your criteria', 'info');
             return;
           }
 
-          movies.forEach(movie => {
-            const movieCard = `
-              <div class="movie-card">
-                <img src="${movie.posterURL}" alt="${movie.title}" />
-                <div class="movie-card-rating">⭐ ${movie.rating}</div>
-                <div class="movie-card-content">
-                  <div class="movie-card-title">${movie.title}</div>
-                  <div class="movie-card-info">
-                    ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
-                  </div>
-                  <div class="movie-card-buttons">
-                    <a href="/movie/${movie._id}" class="movie-card-button watch-btn">
-                      <i class="fas fa-play"></i> Watch
-                    </a>
-                    <a href="/movie/${movie._id}" class="movie-card-button info-btn">
-                      <i class="fas fa-info-circle"></i> Info
-                    </a>
-                  </div>
+          const movieCard = `
+            <div class="movie-card">
+              <img src="${movie.posterURL}" alt="${movie.title}" />
+              <div class="movie-card-rating">⭐ ${movie.rating}</div>
+              <div class="movie-card-content">
+                <div class="movie-card-title">${movie.title}</div>
+                <div class="movie-card-info">
+                  ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/movie/${movie._id}" class="movie-card-button watch-btn">
+                    <i class="fas fa-play"></i> Watch
+                  </a>
+                  <a href="/movie/${movie._id}" class="movie-card-button info-btn">
+                    <i class="fas fa-info-circle"></i> Info
+                  </a>
                 </div>
               </div>
-            `;
-            resultsDiv.innerHTML += movieCard;
-          });
+            </div>
+            <button onclick="get_movie_recommendation()" class="get-another-movie">
+              <i class="fas fa-random"></i> Get Another Movie
+            </button>
+          `;
+          resultsDiv.innerHTML = movieCard;
         } catch (error) {
           console.error('Error fetching recommendations:', error);
-          alert('Error fetching movie recommendations');
+          showfun(error.message || 'Error fetching movie recommendations', 'error');
         }
       }
     </script>

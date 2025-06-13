@@ -209,26 +209,56 @@ export const getMovieById = async (req, res) => {
   }
 };
 
-// Get movie recommendations based on genre and year
+// Get movie recommendations based on genre and time period
 export const getMovieRecommendations = async (req, res) => {
   try {
-    const { genre, year } = req.query;
+    const { genre, time } = req.query;
 
-    if (!genre || !year) {
-      return res.status(400).json({ message: 'Genre and year are required' });
+    if (!genre || !time) {
+      return res.status(400).json({ message: 'Genre and time period are required' });
     }
 
+    // Define date ranges based on time period
+    let dateRange = {};
+    const currentYear = new Date().getFullYear();
+
+    switch (time) {
+      case 'recent':
+        dateRange = {
+          $gte: new Date(2020, 0, 1),
+          $lte: new Date(currentYear, 11, 31)
+        };
+        break;
+      case '2010s':
+        dateRange = {
+          $gte: new Date(2010, 0, 1),
+          $lt: new Date(2020, 0, 1)
+        };
+        break;
+      case 'classic':
+        dateRange = {
+          $lt: new Date(2010, 0, 1)
+        };
+        break;
+      default:
+        return res.status(400).json({ message: 'Invalid time period' });
+    }
+
+    // Find movies that match the genre and time period
     const movies = await Movie.find({
-      genre: genre,
-      releasedate: {
-        $gte: new Date(year, 0, 1),
-        $lt: new Date(parseInt(year) + 1, 0, 1)
-      }
+      genre: { $regex: new RegExp(genre, 'i') },
+      releasedate: dateRange
     })
     .sort({ rating: -1 })
-    .limit(5);
+    .select('title posterURL rating releasedate genre _id');
 
-    res.json(movies);
+    if (movies.length === 0) {
+      return res.json(null); // Return null if no movies found
+    }
+
+    // Pick a random movie from the filtered list
+    const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+    res.json(randomMovie);
   } catch (error) {
     console.error('Error getting movie recommendations:', error);
     res.status(500).json({ message: 'Error getting movie recommendations' });
