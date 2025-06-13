@@ -24,13 +24,22 @@ export const getIndex = async (req, res) => {
 };
 
 // Render the contact page
-export const getcontact = (req, res) => {
-  res.render("pages/contact");
+export const getContact = (req, res) => {
+  res.render("pages/contact", { user: req.user });
 };
 
 // Render the movies page
-export const getmovies = (req, res) => {
-  res.render("pages/movies");
+export const getmovies = async (req, res) => {
+  try {
+    const allMovies = await Movie.find().sort({ releasedate: -1 });
+    res.render("pages/movies", { 
+      movies: allMovies,
+      user: req.user
+    });
+  } catch (err) {
+    console.error("Failed to load movies page:", err);
+    res.status(500).send("Server Error");
+  }
 };
 
 // Render the forget password page
@@ -58,29 +67,32 @@ export const getprofile = async (req, res) => {
 export const getALLCasts = async (req, res) => {
   try {
     const [sliderCasts, allCast] = await Promise.all([
-      Cast.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3), // Fixed variable name from sliderCast to sliderCasts
+      Cast.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3),
       Cast.find(),
     ]);
 
+    // Get trending movies
     const trendingMovies = await Movie.find({ category: "trending" });
 
     // Get trending casts (cast members in trending movies)
+    const trendingCastIds = trendingMovies.flatMap(movie => movie.cast || []);
+    const trendingCasts = await Cast.find({
+      _id: { $in: trendingCastIds }
+    });
 
-     const trendingCastIds = trendingMovies.flatMap(movie => movie.cast || []); // Adjust based on your schema
-     const trendingCasts = allCast.filter(cast => trendingCastIds.includes(cast._id.toString()));
-
-    // // Filter born today (dynamic current date)
-     const today = new Date();
-     const bornToday = allCast.filter(cast => {
-       const birthDate = new Date(cast.birthdate);
-       return birthDate.getDate() === today.getDate() && birthDate.getMonth() === today.getMonth();
+    // Filter born today (dynamic current date)
+    const today = new Date();
+    const bornToday = allCast.filter(cast => {
+      const birthDate = new Date(cast.birthdate);
+      return birthDate.getDate() === today.getDate() && birthDate.getMonth() === today.getMonth();
     });
 
     res.render("pages/casts", {
-      sliderCasts, // Corrected variable name matches template expectation
+      sliderCasts,
       trendingCasts,
       allCast,
       bornToday,
+      user: req.user
     });
   } catch (err) {
     console.error("Failed to load cast page:", err);
@@ -208,7 +220,10 @@ export const getCastDetail = async (req, res) => {
   try {
     const castId = req.params.id;
     const [cast, allCasts] = await Promise.all([
-      Cast.findById(castId).populate('movies', 'title posterURL'),
+      Cast.findById(castId).populate({
+        path: 'movies',
+        select: 'title posterURL duration rating genre'
+      }),
       Cast.find()
     ]);
 
@@ -223,20 +238,119 @@ export const getCastDetail = async (req, res) => {
       c.movies.some(movie => relatedMovieIds.includes(movie._id.toString()))
     ).slice(0, 8); // Limit to 8 related casts
 
-    // Get user with populated favoriteCasts
-    const user = await User.findById(req.user.id).populate('favoriteCasts');
-    
-    // Check if cast is in user's favorites
-    const isFavorite = user && user.favoriteCasts && user.favoriteCasts.some(favCast => favCast._id.toString() === castId);
+    let isFavorite = false;
+    // Only check favorites if user is logged in
+    if (req.user) {
+      const user = await User.findById(req.user.id).populate('favoriteCasts');
+      isFavorite = user && user.favoriteCasts && user.favoriteCasts.some(favCast => favCast._id.toString() === castId);
+    }
 
     res.render("pages/singlecast", {
       cast,
       relatedCasts,
       isFavorite,
-      user: req.user
+      user: req.user || null
     });
   } catch (err) {
     console.error("Error fetching cast detail:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getMovieDetail = async (req, res) => {
+  try {
+    const movieId = req.params.id;
+    const [movie, allMovies, comments] = await Promise.all([
+      Movie.findById(movieId).populate('cast'),
+      Movie.find(),
+      Comment.find({ movie: movieId }).populate('user', 'name')
+    ]);
+
+    if (!movie) {
+      return res.status(404).render("pages/404");
+    }
+
+    // Find related movies (same genre or cast)
+    const relatedMovies = allMovies.filter(m => 
+      m._id.toString() !== movieId && 
+      (m.genre === movie.genre || m.cast.some(c => movie.cast.includes(c)))
+    ).slice(0, 8); // Limit to 8 related movies
+
+    let isFavorite = false;
+    // Only check favorites if user is logged in
+    if (req.user) {
+      const user = await User.findById(req.user.id).populate('favorites');
+      isFavorite = user && user.favorites && user.favorites.some(favMovie => favMovie._id.toString() === movieId);
+    }
+
+    res.render("pages/movie", {
+      movie,
+      relatedMovies,
+      comments,
+      isFavorite,
+      user: req.user || null
+    });
+  } catch (err) {
+    console.error("Error fetching movie detail:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getMyList = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.redirect('/login');
+    }
+
+    const user = await User.findById(req.user.id)
+      .populate('watchlist')
+      .populate('favorites');
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    res.render("pages/mylist", {
+      watchlist: user.watchlist || [],
+      favorites: user.favorites || [],
+      user: req.user
+    });
+  } catch (err) {
+    console.error("Error fetching user's list:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+export const getProfile = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.redirect('/login');
+    }
+
+    const user = await User.findById(req.user.id)
+      .populate('watchlist')
+      .populate('favorites')
+      .populate('favoriteCasts');
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    // Get user's comments
+    const comments = await Comment.find({ user: user._id })
+      .populate('movie', 'title posterURL')
+      .sort({ createdAt: -1 });
+
+    res.render("pages/profile", {
+      user,
+      watchlist: user.watchlist || [],
+      favorites: user.favorites || [],
+      favoriteCasts: user.favoriteCasts || [],
+      comments,
+      isOwnProfile: true
+    });
+  } catch (err) {
+    console.error("Error fetching user profile:", err);
     res.status(500).send("Internal Server Error");
   }
 };

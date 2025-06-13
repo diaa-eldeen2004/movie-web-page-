@@ -5,6 +5,10 @@ body {
   font-family: 'Arial', sans-serif;
 }
 
+.favorites-container {
+  margin-top: 4rem;
+}
+
 .page-title {
   font-size: 2.5rem;
   font-weight: 800;
@@ -19,73 +23,96 @@ body {
 
 .cast-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 2rem;
   padding: 2rem;
 }
 
-.cast-card {
-  background: rgba(255, 255, 255, 0.1);
+.movie-card {
+  position: relative;
   border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
-.cast-card:hover {
+.movie-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
 }
 
-.cast-image {
+.movie-card img {
   width: 100%;
   height: 300px;
   object-fit: cover;
 }
 
-.cast-info {
-  padding: 1.5rem;
+.movie-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7), transparent);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
 }
 
-.cast-name {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
+.movie-card:hover .movie-card-content {
+  transform: translateY(0);
+}
+
+.movie-card-title {
   color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-.cast-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.cast-detail {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.movie-card-info {
   color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-bottom: 15px;
 }
 
-.cast-detail i {
-  color: #f5c518;
+.movie-card-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.movie-card-button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.watch-btn {
+  background: linear-gradient(to right, #f5c518, #ffecb3);
+  color: #000;
 }
 
 .remove-btn {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 1rem;
-  background: linear-gradient(to right, #ff4d4d, #cc0000);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  background: rgba(255, 77, 77, 0.8);
+  color: #fff;
+}
+
+.movie-card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.watch-btn:hover {
+  background: linear-gradient(to right, #ffecb3, #f5c518);
 }
 
 .remove-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+  background: rgba(255, 77, 77, 1);
 }
 
 .empty-state {
@@ -99,7 +126,7 @@ body {
   margin-bottom: 1rem;
 }
 
-.empty-state h3 {
+.empty-state h2 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
