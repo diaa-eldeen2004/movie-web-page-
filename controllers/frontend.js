@@ -6,16 +6,19 @@ import Comment from "../models/comment.js";
 // Render the homepage with slider, trending, and new release movies
 export const getIndex = async (req, res) => {
   try {
-    const [sliderMovies, trendingMovies, newReleaseMovies] = await Promise.all([
+    const [sliderMovies, trendingMovies, newReleaseMovies, casts] = await Promise.all([
       Movie.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3),
       Movie.find({ category: "trending" }),
       Movie.find({ category: "new release" }),
+      Cast.find().limit(8) // Limit to 8 popular casts
     ]);
 
     res.render("pages/index", {
       sliderMovies,
       trendingMovies,
       newReleaseMovies,
+      casts,
+      user: req.user
     });
   } catch (err) {
     console.error("Failed to load homepage:", err);

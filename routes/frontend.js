@@ -64,6 +64,8 @@ router.get("/movies", getmovies);
 router.get("/casts", getALLCasts);
 router.get("/cast/:id", getCastDetail);
 router.get("/movie/:id", getMovieDetail);
+router.get("/mylist", auth(), getMyList);
+router.get("/profile", auth(), getProfile);
 router.get("/contact", getContact);
 router.get("/login", getlogin);
 router.get("/signup", getsignup);
@@ -71,8 +73,6 @@ router.get("/forgetpassword", getfrogetpassword);
 router.get("/2fa", get2fa);
 
 // Protected routes
-router.get("/mylist", auth(["admin", "user"]), getWatchlist);
-router.get("/profile/:id", auth(["admin", "user"]), getProfile);
 router.get("/admin/:id", auth(["admin"]), getAdmin);
 router.get("/edituser/:id", auth(["admin"]), getEditUser);
 router.get("/adduser", auth(["admin"]), getAddUser);
