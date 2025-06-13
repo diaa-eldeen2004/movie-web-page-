@@ -35,7 +35,7 @@ app.use("/api/search", searchRoutes);
 app.use((req, res) => {
   res.render("pages/404");
 });
-
+// maijofnercpfo
 connectDB();
 
 app.listen(PORT, () => {
