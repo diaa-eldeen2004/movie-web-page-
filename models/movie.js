@@ -23,14 +23,10 @@ const movieSchema = new mongoose.Schema({
     required: true,
     min: 1, // Duration in minutes
   },
-  cast: [
-    {
-      name: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
+  cast: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Cast'
+  }],
   rating: {
     type: Number,
     min: 0,
