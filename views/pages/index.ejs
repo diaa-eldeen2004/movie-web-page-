@@ -209,12 +209,11 @@
     </section>
 
     <!-- Admin Button -->
-    <% if (user != null && user.role == 'admin') { %>
+    <% if (user && user.role === 'admin') { %>
     <a href="/admin/:<%= user.id %>" class="sticky-button">
       <i class="fa-solid fa-plus"></i>
     </a>
-    <% } %>
-
+    <% } else if (user && user.role === 'user') { %>
     <!-- Movie Recommendation Button and Interface -->
     <button id="recommendationBtn" class="sticky-button recommendation-btn">
       <i class="fas fa-film"></i>
@@ -257,6 +256,38 @@
         <!-- Movie cards will be inserted here -->
       </div>
     </div>
+    <% } %>
+
+    <!-- Cast Section -->
+    <section class="movie-section">
+      <h2 class="category-title">Popular Cast</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (casts && casts.length > 0) { %>
+            <% casts.forEach(cast => { %>
+              <div class="index-cast-card">
+                <a href="/cast/<%= cast._id %>" class="index-cast-link">
+                  <div class="index-cast-image-container">
+                    <img src="<%= cast.photoURL || cast.profileImageURL || '/images/default-cast.jpg' %>" alt="<%= cast.name %>" class="index-cast-image" />
+                  </div>
+                  <div class="index-cast-name"><%= cast.name %></div>
+                </a>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="no-movies">
+              <p>No cast members available.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
 
     <%- include('../partials/footer.ejs') %>
 
@@ -315,7 +346,7 @@
           // Log the request parameters
           console.log('Requesting with params:', { genre, time });
           
-          const response = await fetch(`/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
+          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
           
           // Log the response status
           console.log('Response status:', response.status);
