@@ -93,3 +93,35 @@
     <% } %>
   </ul>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchContainer = document.querySelector(".search-container");
+    const input = searchContainer.querySelector("input");
+    const searchIcon = searchContainer.querySelector(".search-icon");
+
+    // Enable the input if it’s disabled in HTML
+    input.removeAttribute("disabled");
+
+    function triggerSearch() {
+      const query = input.value.trim();
+      const path = window.location.pathname;
+      let baseSearchPath = "/search"; // default: home
+      if (path.startsWith("/movies")) baseSearchPath = "/movies/search";
+      else if (path.startsWith("/casts")) baseSearchPath = "/casts/search";
+      if (query) {
+        window.location.href = `${baseSearchPath}?q=${encodeURIComponent(query)}`;
+      }
+    }
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        triggerSearch();
+      }
+    });
+    searchIcon.addEventListener("click", function () {
+      triggerSearch();
+    });
+  });
+</script>
