@@ -213,11 +213,176 @@
     <a href="/admin/:<%= user.id %>" class="sticky-button">
       <i class="fa-solid fa-plus"></i>
     </a>
-    <% } %> <%- include('../partials/footer.ejs') %>
+    <% } %>
+
+    <!-- Movie Recommendation Button and Interface -->
+    <button id="recommendationBtn" class="sticky-button recommendation-btn">
+      <i class="fas fa-film"></i>
+    </button>
+
+    <div id="recommendationChat" class="recommendation-chat">
+      <div class="chat-header">
+        <h5>Movie Recommendations</h5>
+        <button class="close-btn" onclick="toggleRecommendationChat()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="chat-body">
+        <div id="chatMessages" class="chat-messages">
+          <div class="message bot">
+            What kind of movies are you looking for?
+          </div>
+        </div>
+        <div class="chat-input">
+          <select id="genreSelect" class="form-select mb-2">
+            <option value="">Select Genre</option>
+            <option value="Action">Action</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Drama">Drama</option>
+            <option value="Horror">Horror</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Romance">Romance</option>
+            <option value="Thriller">Thriller</option>
+          </select>
+          <select id="timeSelect" class="form-select mb-2">
+            <option value="">Select Time Period</option>
+            <option value="recent">Recent (2020 - Present)</option>
+            <option value="2010s">2010s (2010 - 2019)</option>
+            <option value="classic">Classic (Before 2010)</option>
+          </select>
+          <button onclick="get_movie_recommendation()" class="btn btn-primary w-100">Search</button>
+        </div>
+      </div>
+      <div id="recommendationResults" class="recommendation-results">
+        <!-- Movie cards will be inserted here -->
+      </div>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Toastify CSS and JS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <!-- Custom JS -->
     <script type="module" src="/js/script.js"></script>
+    <script>
+      function showfun(msg, type) {
+        const colors = {
+          error: '#ff4444',
+          success: '#00C851',
+          info: '#33b5e5',
+          warning: '#ffbb33'
+        };
+        
+        Toastify({
+          text: msg,
+          duration: 3000,
+          close: true,
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: colors[type] || colors.info,
+            color: "#fff",
+            fontWeight: "bold",
+            fontFamily: "Poppins",
+          },
+          stopOnFocus: true,
+        }).showToast();
+      }
+
+      function toggleRecommendationChat() {
+        const chat = document.getElementById('recommendationChat');
+        chat.classList.toggle('active');
+        if (chat.classList.contains('active')) {
+          get_movie_recommendation();
+        }
+      }
+
+      document.getElementById('recommendationBtn').addEventListener('click', toggleRecommendationChat);
+
+      async function get_movie_recommendation() {
+        const genre = document.getElementById('genreSelect').value;
+        const time = document.getElementById('timeSelect').value;
+        
+        if (!genre && !time) {
+          showfun('Please select at least one filter (genre or time period)', 'warning');
+          return;
+        }
+
+        try {
+          // Log the request parameters
+          console.log('Requesting with params:', { genre, time });
+          
+          const response = await fetch(`/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
+          
+          // Log the response status
+          console.log('Response status:', response.status);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('API Error:', errorData);
+            throw new Error(errorData.message || 'Failed to fetch recommendations');
+          }
+
+          const movie = await response.json();
+          
+          // Log the received movie data
+          console.log('Received movie:', movie);
+          
+          const resultsDiv = document.getElementById('recommendationResults');
+          resultsDiv.innerHTML = '';
+
+          if (!movie) {
+            if (genre && time) {
+              showfun(`No movies found matching ${genre} genre from ${time} period`, 'error');
+            } else if (genre) {
+              showfun(`No movies found in ${genre} genre`, 'error');
+            } else if (time) {
+              showfun(`No movies found from ${time} period`, 'error');
+            }
+            return;
+          }
+
+          const movieCard = `
+            <div class="movie-card">
+              <img src="${movie.posterURL}" alt="${movie.title}" />
+              <div class="movie-card-rating">⭐ ${movie.rating}</div>
+              <div class="movie-card-content">
+                <div class="movie-card-title">${movie.title}</div>
+                <div class="movie-card-info">
+                  ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/movie/${movie._id}" class="movie-card-button watch-btn">
+                    <i class="fas fa-play"></i> Watch
+                  </a>
+                  <a href="/movie/${movie._id}" class="movie-card-button info-btn">
+                    <i class="fas fa-info-circle"></i> Info
+                  </a>
+                </div>
+              </div>
+            </div>
+            <button onclick="get_movie_recommendation()" class="get-another-movie">
+              <i class="fas fa-random"></i> Get Another Movie
+            </button>
+          `;
+          resultsDiv.innerHTML = movieCard;
+
+          // Show success message based on filters used
+          if (genre && time) {
+            showfun(`Found a ${genre} movie from ${time} period!`, 'success');
+          } else if (genre) {
+            showfun(`Found a ${genre} movie!`, 'success');
+          } else if (time) {
+            showfun(`Found a movie from ${time} period!`, 'success');
+          }
+        } catch (error) {
+          console.error('Error fetching recommendations:', error);
+          showfun('Error: ' + error.message, 'error');
+        }
+      }
+    </script>
   </body>
 </html>
