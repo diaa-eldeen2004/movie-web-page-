@@ -317,7 +317,9 @@ export const getCastDetail = async (req, res) => {
   try {
     const castId = req.params.id;
     const [cast, allCasts] = await Promise.all([
-      Cast.findById(castId).populate('movies', 'title posterURL'), // Populate movies with title and posterURL
+      Cast.findById(castId)
+        .select('name photoURL profileImageURL birthdate nationality description movies')
+        .populate('movies', 'title posterURL'), // Populate movies with title and posterURL
       Movie.find(), // Fetch all movies for potential related content
       Cast.find(), // Fetch all casts for related casts
     ]);
