@@ -2,7 +2,8 @@ import express from "express";
 import {
   searchHome,
   searchMovies,
-    searchCasts          
+  searchCasts,
+  searchMyList
 } from "../controllers/search.js";   
 
 const router = express.Router();
@@ -14,6 +15,9 @@ router.get("/movies/search", searchMovies);
 
 // Casts search only
 router.get("/casts/search", searchCasts);
+
+// My List (watchlist) search
+router.get("/mylist/search", searchMyList);
 
 export default router;
 

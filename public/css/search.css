@@ -1,0 +1,103 @@
+/* search.css - styled to match the rest of the project, with smaller movie images */
+body {
+  background: #111;
+  color: #fff;
+}
+
+.container {
+  background: rgba(20, 20, 20, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  padding: 2.5rem 2rem 2rem 2rem;
+  margin-top: 2.5rem;
+}
+
+h2, h3, h4, h5, h6 {
+  color: #f5c518;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.row {
+  margin-top: 1.5rem;
+}
+
+.col-md-3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Make movie and cast images smaller and uniform */
+.img-fluid.rounded.shadow,
+.img-fluid.rounded-circle.shadow {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  border: 2px solid #222;
+  background: #222;
+  transition: transform 0.2s;
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+.img-fluid.rounded-circle.shadow {
+  width: 100px;
+  height: 100px;
+}
+
+.img-fluid.rounded.shadow:hover,
+.img-fluid.rounded-circle.shadow:hover {
+  transform: scale(1.05);
+  border-color: #f5c518;
+}
+
+.text-center, .text-light {
+  color: #fff !important;
+}
+
+p {
+  color: #bbb;
+}
+
+a {
+  color: #f5c518;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Card style for each result */
+.col-md-3 > a, .col-md-3 > div {
+  background: #181818;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  padding: 1rem 0.5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.2rem 0.5rem;
+  }
+  .col-md-3 {
+    margin-bottom: 1.5rem;
+  }
+  .img-fluid.rounded.shadow {
+    width: 90px;
+    height: 130px;
+  }
+  .img-fluid.rounded-circle.shadow {
+    width: 70px;
+    height: 70px;
+  }
+}
