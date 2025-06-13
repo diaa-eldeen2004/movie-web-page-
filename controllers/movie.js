@@ -1,6 +1,7 @@
 import Movie from "../models/movie.js";
 import Cast from "../models/cast.js";
 import User from "../models/user.js";
+import Comment from "../models/comment.js";
 
 // Create a new movie
 export const createMovie = async (req, res) => {
@@ -172,12 +173,19 @@ export const getMovieById = async (req, res) => {
       inList = user.watchlist.includes(movie._id);
     }
 
-    // Render movie page with movie and related movies
+    // Fetch comments for the movie
+    const comments = await Comment.find({ movie: movie._id })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 });
 
-    res.render("pages/movie", { movie, relatedMovies, user: res.locals.user });
-
-    res.render("pages/movie", { movie, relatedMovies, inList });
-
+    // Render movie page with movie, related movies, and comments
+    res.render("pages/movie", { 
+      movie, 
+      relatedMovies, 
+      inList,
+      comments,
+      user: req.user 
+    });
   } catch (err) {
     console.error("Error fetching movie:", err);
     res.status(500).send("Server Error");
