@@ -30,7 +30,7 @@ app.use("/api/mylist", mylistRoutes);
 app.use('/api/cast', castRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/favorites", favoriteRoutes);
-app.use("/api/search", searchRoutes);
+app.use(searchRoutes);
 
 app.use((req, res) => {
   res.render("pages/404");
