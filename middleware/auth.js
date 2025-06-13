@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 
 const auth = (allowedRoles = []) => {
   return async (req, res, next) => {
@@ -10,19 +11,27 @@ const auth = (allowedRoles = []) => {
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded; // { id, role }
+      const user = await User.findById(decoded.id);
+      
+      if (!user) {
+        res.clearCookie("jwt");
+        return res.redirect("/login");
+      }
+
+      req.user = user;
+      res.locals.user = user;
 
       // If roles are defined, restrict access
-      if (allowedRoles.length && !allowedRoles.includes(decoded.role)) {
+      if (allowedRoles.length && !allowedRoles.includes(user.role)) {
         return res.status(403).json({ message: "Forbidden: Access denied" });
       }
 
       next();
     } catch (error) {
-      res
-        .status(401)
-        .json({ message: "Invalid or expired token", error: error.message });
+      res.clearCookie("jwt");
+      res.redirect("/login");
     }
   };
 };
+
 export default auth;

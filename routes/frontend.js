@@ -4,13 +4,15 @@ import jwt from "jsonwebtoken";
 import auth from "../middleware/auth.js";
 import {
   getIndex,
-  getcontact,
-  getlogin,
   getmovies,
-  getprofile,
   getALLCasts,
+  getCastDetail,
+  getMovieDetail,
+  getMyList,
+  getProfile,
+  getContact,
+  getlogin,
   getsignup,
-  getsettings,
   getAdmin,
   getfrogetpassword,
   getEditUser,
@@ -20,7 +22,6 @@ import {
   getEditMovie,
   getAddCast, 
   getEditCast,
-  getCastDetail,
 } from "../controllers/frontend.js";
 import { getWatchlist } from "../controllers/mylist.js";
 import { getMovieById } from "../controllers/movie.js";
@@ -33,39 +34,51 @@ router.use(async (req, res, next) => {
     const token = req.cookies.jwt;
 
     if (!token) {
-      res.locals.user = null; // No user found
+      req.user = null;
+      res.locals.user = null;
       return next();
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    res.locals.user = await UserModel.findById(decoded.id);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await UserModel.findById(decoded.id);
+    
+    if (user) {
+      req.user = user;
+      res.locals.user = user;
+    } else {
+      req.user = null;
+      res.locals.user = null;
+    }
+    
     next();
   } catch (error) {
+    req.user = null;
+    res.locals.user = null;
     next();
   }
 });
 
-// Existing routes
+// Public routes
 router.get("/", getIndex);
-router.get("/contact", getcontact);
 router.get("/movies", getmovies);
-
-router.get("/mylist", auth(), getWatchlist);
-
 router.get("/casts", getALLCasts);
-router.get("/settings", getsettings);
+router.get("/cast/:id", getCastDetail);
+router.get("/movie/:id", getMovieDetail);
+router.get("/contact", getContact);
 router.get("/login", getlogin);
 router.get("/signup", getsignup);
-router.get("/2fapage", get2fa);
 router.get("/forgetpassword", getfrogetpassword);
+router.get("/2fa", get2fa);
+
+// Protected routes
+router.get("/mylist", auth(["admin", "user"]), getWatchlist);
+router.get("/profile/:id", auth(["admin", "user"]), getProfile);
 router.get("/admin/:id", auth(["admin"]), getAdmin);
-router.get("/addMovie", auth(["admin"]), getAddMovie);
+router.get("/edituser/:id", auth(["admin"]), getEditUser);
 router.get("/adduser", auth(["admin"]), getAddUser);
-router.get("/profile/:id", auth(["admin", "user"]), getprofile);
+router.get("/addmovie", auth(["admin"]), getAddMovie);
 router.get("/editmovie/:id", auth(["admin"]), getEditMovie);
-router.get("/edituser/:id", auth(["admin", "user"]), getEditUser);
-router.get("/movies/:id", getMovieById);
 router.get("/addcast", auth(["admin"]), getAddCast);
 router.get("/editcast/:id", auth(["admin"]), getEditCast);
-router.get("/cast/:id", auth(), getCastDetail);
+
 export default router;

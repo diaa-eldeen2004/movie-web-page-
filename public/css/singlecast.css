@@ -3,26 +3,58 @@ body {
   background-color: rgb(0, 0, 0);
   color: white;
   font-family: 'Arial', sans-serif;
+  line-height: 1.6;
 }
 
-.cast-detail-section {
-  background: #181818;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+/* Cast Detail Section */
+.cast-detail {
+  background: linear-gradient(to bottom, #181818, #0a0a0a);
   border-radius: 16px;
   box-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
-  padding: 2.5rem 2rem 2rem 2rem;
+  padding: 2.5rem;
   margin-bottom: 2.5rem;
   display: flex;
   flex-wrap: wrap;
   gap: 2.5rem;
   align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.cast-detail::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #f5c518, #ffecb3);
+}
+
+.cast-image-container {
+  flex: 0 0 300px;
+  position: relative;
 }
 
 .cast-image {
-  width: 300px;
+  width: 100%;
   height: 450px;
   object-fit: cover;
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.cast-image:hover {
+  transform: scale(1.02);
 }
 
 .cast-info {
@@ -33,12 +65,13 @@ body {
 .cast-name {
   font-size: 3rem;
   font-weight: 800;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   color: #fff;
   text-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
   background: linear-gradient(to right, #fff, #ccc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  line-height: 1.2;
 }
 
 .cast-details {
@@ -46,107 +79,241 @@ body {
   flex-direction: column;
   gap: 1rem;
   margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
 }
 
-.cast-detail {
+.cast-details p {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
 }
 
-.cast-detail i {
+.cast-details i {
   color: #f5c518;
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
 }
 
 .cast-bio {
-  font-size: 1.2rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
   margin-bottom: 2rem;
 }
 
-.movies-section {
-  margin-top: 2rem;
+.cast-bio h3 {
+  font-size: 1.5rem;
+  color: #f5c518;
+  margin-bottom: 1rem;
 }
 
-.movies-section h3 {
+.cast-bio p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Movies Section */
+.movies-section {
+  margin-top: 3rem;
+}
+
+.movies-section h2 {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   color: #fff;
+  position: relative;
+  padding-bottom: 0.5rem;
 }
 
-.movies-grid {
+.movies-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #f5c518, #ffecb3);
+}
+
+.movie-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 2rem;
 }
 
 .movie-card {
-  background: rgba(255, 255, 255, 0.1);
+  position: relative;
   border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .movie-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
 }
 
-.movie-image {
+.movie-card img {
   width: 100%;
   height: 300px;
   object-fit: cover;
 }
 
-.movie-info {
-  padding: 1.5rem;
+.movie-card-rating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #f5c518;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: bold;
 }
 
-.movie-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
+.movie-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7), transparent);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.movie-card:hover .movie-card-content {
+  transform: translateY(0);
+}
+
+.movie-card-title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.movie-card-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.movie-card-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.movie-card-button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.watch-btn {
+  background: linear-gradient(to right, #f5c518, #ffecb3);
+  color: #000;
+}
+
+.info-btn {
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
 
-.movie-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.movie-card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-.movie-detail {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.8);
+.watch-btn:hover {
+  background: linear-gradient(to right, #ffecb3, #f5c518);
 }
 
-.movie-detail i {
-  color: #f5c518;
+.info-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
+/* Favorite Button */
 .favorite-btn {
   width: 100%;
-  padding: 0.8rem;
-  margin-top: 1rem;
+  padding: 1rem;
+  margin-top: 1.5rem;
   background: linear-gradient(to right, #ff4d4d, #cc0000);
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .favorite-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4);
 }
 
 .favorite-btn i {
-  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.favorite-btn.favorited {
+  background: linear-gradient(to right, #cc0000, #ff4d4d);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .cast-detail {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .cast-image-container {
+    flex: 0 0 100%;
+  }
+
+  .cast-name {
+    font-size: 2.5rem;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cast-name {
+    font-size: 2rem;
+  }
+
+  .cast-details p {
+    font-size: 1rem;
+  }
+
+  .cast-bio p {
+    font-size: 1rem;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
 } 

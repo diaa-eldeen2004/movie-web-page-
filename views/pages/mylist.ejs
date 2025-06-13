@@ -17,52 +17,74 @@
     <h1 class="mb-4 text-center fw-bold">My Watchlist</h1>
 
     <div class="row">
-      <% if (user.watchlist.length === 0) { %>
-        <p class="text-center">Your list is empty.</p>
+      <% if (!watchlist || watchlist.length === 0) { %>
+        <div class="col-12 text-center">
+          <p class="text-muted">Your watchlist is empty.</p>
+          <a href="/movies" class="btn btn-primary mt-3">Browse Movies</a>
+        </div>
       <% } else { %>
-        <% user.watchlist.forEach(movie => { %>
-  <div class="col-md-3 mb-4 position-relative">
-    <a href="/movies/<%= movie._id %>">
-      <img src="<%= movie.posterURL %>" class="img-fluid rounded shadow" alt="<%= movie.title %> poster" />
-    </a>
-    <button 
-      class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-btn" 
-      data-movie-id="<%= movie._id %>">
-      <i class="fas fa-trash-alt"></i>
-    </button>
-  </div>
-<% }) %>
+        <% watchlist.forEach(movie => { %>
+          <div class="col-md-3 mb-4 position-relative">
+            <div class="movie-card">
+              <a href="/movie/<%= movie._id %>">
+                <img src="<%= movie.posterURL %>" class="img-fluid rounded shadow" alt="<%= movie.title %> poster" />
+              </a>
+              <div class="movie-info">
+                <h5 class="movie-title"><%= movie.title %></h5>
+                <button 
+                  class="btn btn-danger btn-sm delete-btn" 
+                  data-movie-id="<%= movie._id %>"
+                  onclick="removeFromWatchlist('<%= movie._id %>')">
+                  <i class="fas fa-trash-alt"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        <% }) %>
       <% } %>
     </div>
   </section>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', async (e) => {
-          const movieId = button.dataset.movieId;
+  <% if (user && user.role === 'admin') { %>
+    <a href="/admin/<%= user.id %>" class="sticky-button">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+  <% } %>
 
-          try {
-            const response = await fetch(`/api/mylist/${movieId}`, {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-              }
-            });
+  <%- include('../partials/footer') %>
 
-            if (response.ok) {
-              // Remove the movie card from the DOM
-              button.closest('.col-md-3').remove();
-            } else {
-              console.error('Failed to delete movie from watchlist');
-            }
-          } catch (err) {
-            console.error('Error:', err);
-          }
+  <script type="module">
+    import showFunToast from "/js/toast.js";
+
+    window.removeFromWatchlist = async function(movieId) {
+      try {
+        const response = await fetch(`/api/mylist/${movieId}`, {
+          method: 'DELETE',
+          credentials: 'include'
         });
-      });
-    });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showFunToast("✅ Movie removed from watchlist", "linear-gradient(to right, #00eaff, #00a8b5)");
+          // Remove the movie card from the DOM
+          const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`).closest('.col-md-3');
+          movieCard.remove();
+          
+          // If no movies left, show empty state
+          const remainingMovies = document.querySelectorAll('.movie-card');
+          if (remainingMovies.length === 0) {
+            location.reload(); // Reload to show empty state
+          }
+        } else {
+          showFunToast(data.message || "❌ Failed to remove movie", "red");
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showFunToast("❌ An error occurred", "red");
+      }
+    };
   </script>
-  <script src="/js/script.js"></script>
+    <script src="/js/script.js"></script>
 </body>
 </html>
