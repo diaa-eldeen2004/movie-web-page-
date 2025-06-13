@@ -31,9 +31,13 @@
   </div>
 
   <div class="search-container">
-    <i class="fas fa-search search-icon" id="searchToggle"></i>
-    <input type="text" placeholder="Search..." id="searchInput" />
-    <i class="fas fa-times close-icon" id="closeSearch"></i>
+    <i class="fas fa-search search-icon"></i>
+    <input 
+      type="text" 
+      placeholder="Search movies and casts..." 
+      disabled
+    />
+    <i class="fas fa-times close-icon"></i>
   </div>
 </nav>
 
@@ -43,60 +47,47 @@
     <i class="fas fa-times"></i>
   </button>
   <ul>
-    <div class="profile-photo">
-      <% if (user) { %>
-      <div class="profile-image" id="profileImage">
-        <img src="/images/cel4.jpg" alt="Profile" class="user-img" />
-      </div>
-      <% } else { %>
-      <div class="profile-image" id="profileImage">
-        <img src="/images/cel4.jpg" alt="Profile" class="user-img" />
-      </div>
-      <% } %>
-    </div>
+    <li>
+      <a href="/" class="nav-item"><i class="ri-home-2-line"></i> Home</a>
+    </li>
+    <hr />
     <% if (user) { %>
     <li>
       <a href="/profile/<%= user.id %>" class="nav-item"
         ><i class="ri-user-6-line"></i> Profile</a
       >
     </li>
-
-    <% } %>
-
-    <li>
-      <a href="/" class="nav-item"><i class="ri-home-2-line"></i> Home</a>
-    </li>
     <li>
       <a href="/mylist" class="nav-item"
         ><i class="ri-list-ordered"></i> My List</a
       >
     </li>
-    <hr />
-    <li>
-      <a href="/settings" class="nav-item"
-        ><i class="ri-settings-line"></i> Settings</a
-      >
-    </li>
-    <li>
-      <a href="/contact" class="nav-item"
-        ><i class="ri-mail-send-line"></i> Contact us</a
-      >
-    </li>
-    <% if (!user) { %>
-    <li>
-      <a href="/login" class="nav-item"
-        ><i class="ri-login-box-line"></i> Login</a
-      >
-    </li>
-    <% } else { %>
     <li>
       <a href="/api/favorites" class="nav-item"
         ><i class="fas fa-heart"></i> Favorites</a
       >
     </li>
+    <hr />
+    <li>
+      <a href="/contact" class="nav-item"
+        ><i class="ri-mail-send-line"></i> Contact us</a
+      >
+    </li>
     <li>
       <a href="/api/auth/logout" id="logout" class="nav-item"
         ><i class="ri-logout-box-r-line"></i> Logout</a
+      >
+    </li>
+    <% } else { %>
+    <li>
+      <a href="/contact" class="nav-item"
+        ><i class="ri-mail-send-line"></i> Contact us</a
+      >
+    </li>
+    <hr />
+    <li>
+      <a href="/login" class="nav-item"
+        ><i class="ri-login-box-line"></i> Login</a
       >
     </li>
     <% } %>

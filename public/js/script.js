@@ -330,3 +330,63 @@ movies.forEach((movie) => {
   const card = createMovieCard(movie);
   container.appendChild(card);
 });
+
+// Copy functionality for contact page
+document.addEventListener('DOMContentLoaded', function() {
+    const copyButtons = document.querySelectorAll('.copy-icon');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            try {
+                const targetId = this.getAttribute('data-copy');
+                const textToCopy = document.getElementById(targetId).textContent;
+                
+                // Use the modern Clipboard API
+                await navigator.clipboard.writeText(textToCopy);
+                
+                // Visual feedback
+                const originalColor = this.style.color;
+                this.style.color = '#007bff';
+                
+                // Change icon temporarily to show success
+                const originalClass = this.className;
+                this.className = 'ri-check-line copy-icon';
+                
+                // Reset after 1 second
+                setTimeout(() => {
+                    this.style.color = originalColor;
+                    this.className = originalClass;
+                }, 1000);
+                
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                // Fallback for older browsers
+                const targetId = this.getAttribute('data-copy');
+                const textToCopy = document.getElementById(targetId).textContent;
+                
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    // Visual feedback for success
+                    const originalColor = this.style.color;
+                    this.style.color = '#007bff';
+                    setTimeout(() => {
+                        this.style.color = originalColor;
+                    }, 1000);
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        });
+    });
+});

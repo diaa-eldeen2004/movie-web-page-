@@ -3,6 +3,17 @@ import Cast from "../models/cast.js";
 import User from "../models/user.js";
 import Comment from "../models/comment.js";
 
+// Get all movies
+export const getMovies = async (req, res) => {
+  try {
+    const movies = await Movie.find().sort({ releasedate: -1 });
+    res.json(movies);
+  } catch (err) {
+    console.error("Error fetching movies:", err);
+    res.status(500).json({ error: "Failed to fetch movies" });
+  }
+};
+
 // Create a new movie
 export const createMovie = async (req, res) => {
   try {
@@ -12,7 +23,7 @@ export const createMovie = async (req, res) => {
       duration,
       rating,
       genre,
-      cast, // array of { name: "Actor Name" }
+      cast, // array of cast names
       description,
       posterURL,
       trailerURL,
@@ -20,19 +31,20 @@ export const createMovie = async (req, res) => {
     } = req.body;
 
     if (!title || !releasedate || !duration || !rating || !genre || !cast || !description || !posterURL || !trailerURL || !category) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    if (!Array.isArray(cast) || cast.some(actor => !actor.name)) {
-      return res.status(400).json({ error: "Cast must be an array of objects with a 'name' field." });
+    if (!Array.isArray(cast)) {
+      return res.status(400).json({ message: "Cast must be an array of names" });
     }
 
+    // Process cast members
     const castIds = await Promise.all(
-      cast.map(async (actor) => {
-        let existing = await Cast.findOne({ name: actor.name });
+      cast.map(async (actorName) => {
+        let existing = await Cast.findOne({ name: actorName });
         if (!existing) {
           existing = new Cast({
-            name: actor.name,
+            name: actorName,
             birthdate: new Date(), // Placeholder
             nationality: "Unknown",
             description: "No description provided.",
@@ -58,10 +70,10 @@ export const createMovie = async (req, res) => {
     });
 
     await movie.save();
-    res.status(201).json(movie);
+    res.status(201).json({ message: "Movie created successfully", movie });
   } catch (err) {
     console.error("Error creating movie:", err);
-    res.status(500).json({ error: "Failed to create movie", details: err.message });
+    res.status(500).json({ message: "Failed to create movie", details: err.message });
   }
 };
 
