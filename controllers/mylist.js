@@ -33,7 +33,7 @@ export const getWatchlist = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate({
       path: "watchlist",
-      select: "title posterURL _id"
+      select: "title posterURL _id genre releaseYear rating"
     });
 
     if (!user) {
