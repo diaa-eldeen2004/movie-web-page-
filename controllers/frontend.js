@@ -1,15 +1,15 @@
-import UserModel from "../models/user.js";
-import MovieModel from "../models/movie.js";
-import CastModel from "../models/cast.js";
+import User from "../models/user.js";
+import Movie from "../models/movie.js";
+import Cast from "../models/cast.js";
 import Comment from "../models/comment.js";
 
 // Render the homepage with slider, trending, and new release movies
 export const getIndex = async (req, res) => {
   try {
     const [sliderMovies, trendingMovies, newReleaseMovies] = await Promise.all([
-      MovieModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3),
-      MovieModel.find({ category: "trending" }),
-      MovieModel.find({ category: "new release" }),
+      Movie.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3),
+      Movie.find({ category: "trending" }),
+      Movie.find({ category: "new release" }),
     ]);
 
     res.render("pages/index", {
@@ -42,7 +42,7 @@ export const getfrogetpassword = (req, res) => {
 export const getprofile = async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await UserModel.findById(userId);
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).send("User not found");
     }
@@ -58,11 +58,11 @@ export const getprofile = async (req, res) => {
 export const getALLCasts = async (req, res) => {
   try {
     const [sliderCasts, allCast] = await Promise.all([
-      CastModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3), // Fixed variable name from sliderCast to sliderCasts
-      CastModel.find(),
+      Cast.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3), // Fixed variable name from sliderCast to sliderCasts
+      Cast.find(),
     ]);
 
-    const trendingMovies = await MovieModel.find({ category: "trending" });
+    const trendingMovies = await Movie.find({ category: "trending" });
 
     // Get trending casts (cast members in trending movies)
 
@@ -113,12 +113,12 @@ export const getAdmin = async (req, res) => {
   try {
 
     const [users, allMovies, sliderMovies, allCast, allComments, sliderCasts] = await Promise.all([
-      UserModel.find(),
-      MovieModel.find(),
-      MovieModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }),
-      CastModel.find(),
+      User.find(),
+      Movie.find(),
+      Movie.find({ isInSlider: true }).sort({ sliderPosition: 1 }),
+      Cast.find(),
       Comment.find().populate("user movie", "name title"),
-      CastModel.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3),
+      Cast.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3),
 
     ]);
 
@@ -140,7 +140,7 @@ export const getAdmin = async (req, res) => {
 // Render the edit user page
 export const getEditUser = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user) return res.status(404).send("User not found");
 
     res.render("admin/editUser", { user });
@@ -165,8 +165,8 @@ export const getEditMovie = async (req, res) => {
   try {
     const movieid = req.params.id;
     const [movie, castMembers] = await Promise.all([
-      MovieModel.findById(movieid),
-      CastModel.find(),
+      Movie.findById(movieid),
+      Cast.find(),
     ]);
 
     if (!movie) {
@@ -191,7 +191,7 @@ export const getAddCast = (req, res) => {
 // Render the edit cast page
 export const getEditCast = async (req, res) => {
   try {
-    const cast = await CastModel.findById(req.params.id).populate("movies", "title"); // or "title" depending on your schema
+    const cast = await Cast.findById(req.params.id).populate("movies", "title"); // or "title" depending on your schema
     if (!cast) {
       return res.status(404).send("cast not found");
     }
@@ -199,6 +199,44 @@ export const getEditCast = async (req, res) => {
     res.render("admin/editcast", { cast });
   } catch (err) {
     console.error("Error fetching cast:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+// Get cast detail
+export const getCastDetail = async (req, res) => {
+  try {
+    const castId = req.params.id;
+    const [cast, allCasts] = await Promise.all([
+      Cast.findById(castId).populate('movies', 'title posterURL'),
+      Cast.find()
+    ]);
+
+    if (!cast) {
+      return res.status(404).render("pages/404");
+    }
+
+    // Find related casts (those who share movies with this cast member)
+    const relatedMovieIds = cast.movies.map(movie => movie._id.toString());
+    const relatedCasts = allCasts.filter(c => 
+      c._id.toString() !== castId && // Exclude the current cast
+      c.movies.some(movie => relatedMovieIds.includes(movie._id.toString()))
+    ).slice(0, 8); // Limit to 8 related casts
+
+    // Get user with populated favoriteCasts
+    const user = await User.findById(req.user.id).populate('favoriteCasts');
+    
+    // Check if cast is in user's favorites
+    const isFavorite = user && user.favoriteCasts && user.favoriteCasts.some(favCast => favCast._id.toString() === castId);
+
+    res.render("pages/singlecast", {
+      cast,
+      relatedCasts,
+      isFavorite,
+      user: req.user
+    });
+  } catch (err) {
+    console.error("Error fetching cast detail:", err);
     res.status(500).send("Internal Server Error");
   }
 };

@@ -48,6 +48,12 @@ const userSchema = new Schema({
       ref: "Movie",
     },
   ],
+  favoriteCasts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Cast",
+    },
+  ],
   watchlist: [
     {
       type: mongoose.Schema.Types.ObjectId,

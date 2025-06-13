@@ -20,6 +20,7 @@ import {
   getEditMovie,
   getAddCast, 
   getEditCast,
+  getCastDetail,
 } from "../controllers/frontend.js";
 import { getWatchlist } from "../controllers/mylist.js";
 import { getMovieById } from "../controllers/movie.js";
@@ -48,7 +49,9 @@ router.use(async (req, res, next) => {
 router.get("/", getIndex);
 router.get("/contact", getcontact);
 router.get("/movies", getmovies);
-router.get("/mylist", auth(["user", "admin"]), getWatchlist);
+
+router.get("/mylist", auth(), getWatchlist);
+
 router.get("/casts", getALLCasts);
 router.get("/settings", getsettings);
 router.get("/login", getlogin);
@@ -64,4 +67,5 @@ router.get("/edituser/:id", auth(["admin", "user"]), getEditUser);
 router.get("/movies/:id", getMovieById);
 router.get("/addcast", auth(["admin"]), getAddCast);
 router.get("/editcast/:id", auth(["admin"]), getEditCast);
+router.get("/cast/:id", auth(), getCastDetail);
 export default router;

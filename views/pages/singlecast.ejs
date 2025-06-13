@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= cast.name %> - Movie Website</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/singlecast.css" />
+  </head>
+  <body>
+    <%- include("../partials/navbar") %>
+
+    <div class="container">
+      <div class="cast-detail">
+        <div class="cast-image-container">
+          <img
+            src="<%= cast.profileImageURL %>"
+            alt="<%= cast.name %>"
+            class="cast-image"
+          />
+        </div>
+        <div class="cast-info">
+          <h1 class="cast-name"><%= cast.name %></h1>
+          <div class="cast-details">
+            <p><i class="fas fa-theater-masks"></i> <%= cast.role %></p>
+            <p><i class="fas fa-birthday-cake"></i> <%= cast.birthDate %></p>
+            <p><i class="fas fa-map-marker-alt"></i> <%= cast.birthPlace %></p>
+          </div>
+          <div class="cast-bio">
+            <h3>Biography</h3>
+            <p><%= cast.biography %></p>
+          </div>
+          <button
+            class="favorite-btn <%= isFavorite ? 'favorited' : '' %>"
+            onclick="toggleFavorite('<%= cast._id %>')"
+          >
+            <i class="fas fa-heart"></i>
+            <%= isFavorite ? 'Remove from Favorites' : 'Add to Favorites' %>
+          </button>
+        </div>
+      </div>
+
+      <div class="movies-section">
+        <h2>Movies</h2>
+        <div class="movie-grid">
+          <% cast.movies.forEach((movie) => { %>
+          <div class="movie-card">
+            <img
+              src="<%= movie.posterImageURL %>"
+              alt="<%= movie.title %>"
+              class="movie-image"
+            />
+            <div class="movie-info">
+              <h3 class="movie-title"><%= movie.title %></h3>
+              <div class="movie-details">
+                <span><i class="fas fa-star"></i> <%= movie.rating %></span>
+                <span><i class="fas fa-clock"></i> <%= movie.duration %></span>
+              </div>
+              <a href="/movie/<%= movie._id %>" class="view-btn">View Details</a>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/singlecast.js"></script>
+  </body>
+</html>

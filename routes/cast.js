@@ -11,7 +11,7 @@ import {
 
 const router = express.Router();
 router.post('/', createCast);
-router.post('/:id', getCastDetail);
+router.post('/getcast/:id', getCastDetail);
 router.put('/update/:id', updateCast);
 router.delete('/:id', deleteCast);
 router.post("/castslider/add", addCastToSlider);
