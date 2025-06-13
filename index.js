@@ -33,7 +33,7 @@ app.use("/api/favorites", favoriteRoutes);
 app.use((req, res) => {
   res.render("pages/404");
 });
-
+// maijofnercpfo
 connectDB();
 
 app.listen(PORT, () => {
