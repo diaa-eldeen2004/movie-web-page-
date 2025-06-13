@@ -1370,25 +1370,32 @@
       };
 
       // Delete cast
-      window.deleteCast = (btn) => {
+      window.deleteCast = async (btn) => {
         const cast_id = btn.getAttribute("data-cast-id");
-
-        fetch(`/api/cast/${cast_id}`, { method: "DELETE" })
-          .then(async (response) => {
-            const data = await response.json();
-            if (response.ok) {
-              showFunToast(
-                data.message || "✅ Cast member deleted successfully!",
-                "linear-gradient(to right, #00eaff, #00a8b5)"
-              );
-              setTimeout(() => window.location.reload(), 1000);
-            } else {
-              showFunToast(data.message || "❗ An error occurred.", "red");
+        
+        try {
+          const response = await fetch(`/api/cast/${cast_id}`, { 
+            method: "DELETE",
+            headers: {
+              'Content-Type': 'application/json'
             }
-          })
-          .catch((error) => {
-            showFunToast(error.message || "❗ An error occurred.", "red");
           });
+
+          const data = await response.json();
+          
+          if (response.ok) {
+            showFunToast(
+              data.message || "✅ Cast member deleted successfully!",
+              "linear-gradient(to right, #00eaff, #00a8b5)"
+            );
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            showFunToast(data.error || "❗ Failed to delete cast member", "red");
+          }
+        } catch (error) {
+          console.error("Delete cast error:", error);
+          showFunToast("❗ An error occurred while deleting the cast member", "red");
+        }
       };
 
       // Delete comment
@@ -1550,8 +1557,6 @@
           showFunToast(error.message || "❗ An error occurred.", "red");
         }
       };
-
-
 
       // Open custom position modal for casts
       window.addToCastSlider = (castId) => {

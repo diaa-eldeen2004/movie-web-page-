@@ -1,5 +1,6 @@
 import Movie from "../models/movie.js";
 import Cast from "../models/cast.js";
+import User from "../models/user.js";
 
 // Create a new movie
 export const createMovie = async (req, res) => {
@@ -164,8 +165,15 @@ export const getMovieById = async (req, res) => {
       genre: { $in: movie.genre },
     }).limit(6);
 
+    // Check if movie is in user's watchlist
+    let inList = false;
+    if (req.user) {
+      const user = await User.findById(req.user.id);
+      inList = user.watchlist.includes(movie._id);
+    }
+
     // Render movie page with movie and related movies
-    res.render("pages/movie", { movie, relatedMovies });
+    res.render("pages/movie", { movie, relatedMovies, inList });
   } catch (err) {
     console.error("Error fetching movie:", err);
     res.status(500).send("Server Error");

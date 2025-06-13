@@ -26,7 +26,7 @@
       ><i class="fas fa-users"></i> casts</a
     >
     <a href="/mylist" class="menu-list-item"
-      ><i class="fa-solid fa-fire"></i> My List</a
+      ><i class="fa-solid fa-list"></i> My List</a
     >
   </div>
 
@@ -89,6 +89,11 @@
       >
     </li>
     <% } else { %>
+    <li>
+      <a href="/api/favorites" class="nav-item"
+        ><i class="fas fa-heart"></i> Favorites</a
+      >
+    </li>
     <li>
       <a href="/api/auth/logout" id="logout" class="nav-item"
         ><i class="ri-logout-box-r-line"></i> Logout</a
