@@ -8,40 +8,49 @@
   <link rel="stylesheet" href="/css/styles.css" />
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <link rel="stylesheet" href="/css/mylist.css" />
 </head>
 <body>
   <%- include('../partials/navbar') %>
 
-  <section class="container my-5 pt-5">
-    <h1 class="mb-4 text-center fw-bold">My Watchlist</h1>
-
-    <div class="row">
-      <% if (!watchlist || watchlist.length === 0) { %>
-        <div class="col-12 text-center">
-          <p class="text-muted">Your watchlist is empty.</p>
-          <a href="/movies" class="btn btn-primary mt-3">Browse Movies</a>
-        </div>
-      <% } else { %>
-        <% watchlist.forEach(movie => { %>
-          <div class="col-md-3 mb-4 position-relative">
+  <section class="movie-section" style="margin-top: 80px;">
+    <h2 class="category-title">My Watchlist</h2>
+    <div class="row-container">
+      <div class="movie-row">
+        <% if (!watchlist || watchlist.length === 0) { %>
+          <div class="no-movies">
+            <p>Your watchlist is empty.</p>
+            <a href="/movies" class="btn btn-primary mt-3">Browse Movies</a>
+          </div>
+        <% } else { %>
+          <% watchlist.forEach(movie => { %>
             <div class="movie-card">
-              <a href="/movie/<%= movie._id %>">
-                <img src="<%= movie.posterURL %>" class="img-fluid rounded shadow" alt="<%= movie.title %> poster" />
-              </a>
-              <div class="movie-info">
-                <h5 class="movie-title"><%= movie.title %></h5>
-                <button 
-                  class="btn btn-danger btn-sm delete-btn" 
-                  data-movie-id="<%= movie._id %>"
-                  onclick="removeFromWatchlist('<%= movie._id %>')">
-                  <i class="fas fa-trash-alt"></i> Remove
-                </button>
+              <img src="<%= movie.posterURL %>" alt="<%= movie.title %>" />
+              <div class="movie-card-rating">⭐ <%= movie.rating %></div>
+              <div class="movie-card-content">
+                <div class="movie-card-title"><%= movie.title %></div>
+                <div class="movie-card-info">
+                  <%= movie.releaseYear %> • <%= movie.genre.join(', ') %>
+                </div>
+                <div class="movie-card-buttons">
+                  <button 
+                    onclick="removeFromWatchlist('<%= movie._id %>')"
+                    class="movie-card-button watch-btn"
+                    style="background-color: #dc3545;"
+                  >
+                    <i class="fas fa-trash-alt"></i> Remove
+                  </button>
+                  <a
+                    href="/api/movies/<%= movie._id %>"
+                    class="movie-card-button info-btn"
+                  >
+                    <i class="fas fa-info-circle"></i> Info
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        <% }) %>
-      <% } %>
+          <% }) %>
+        <% } %>
+      </div>
     </div>
   </section>
 
@@ -68,7 +77,7 @@
         if (response.ok) {
           showFunToast("✅ Movie removed from watchlist", "linear-gradient(to right, #00eaff, #00a8b5)");
           // Remove the movie card from the DOM
-          const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`).closest('.col-md-3');
+          const movieCard = document.querySelector(`[onclick="removeFromWatchlist('${movieId}')"]`).closest('.movie-card');
           movieCard.remove();
           
           // If no movies left, show empty state
@@ -85,6 +94,6 @@
       }
     };
   </script>
-    <script src="/js/script.js"></script>
+  <script src="/js/script.js"></script>
 </body>
 </html>

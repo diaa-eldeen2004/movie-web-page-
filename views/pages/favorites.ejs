@@ -14,20 +14,19 @@
       href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link rel="stylesheet" href="/css/favorites.css" />
   </head>
   <body>
     <%- include("../partials/navbar") %>
 
-    <div class="favorites-container">
-      <div class="container">
-        <h1 class="page-title">My Favorites</h1>
-
-        <% if (favoriteCasts && favoriteCasts.length > 0) { %>
-          <div class="cast-grid">
+    <section class="movie-section" style="margin-top: 80px;">
+      <h2 class="category-title">My Favorites</h2>
+      <div class="row-container">
+        <div class="movie-row">
+          <% if (favoriteCasts && favoriteCasts.length > 0) { %>
             <% favoriteCasts.forEach((cast) => { %>
               <div class="movie-card">
                 <img src="<%= cast.profileImageURL %>" alt="<%= cast.name %>" />
+                <div class="movie-card-rating">⭐ <%= cast.rating || 'N/A' %></div>
                 <div class="movie-card-content">
                   <div class="movie-card-title"><%= cast.name %></div>
                   <div class="movie-card-info">
@@ -44,17 +43,15 @@
                 </div>
               </div>
             <% }); %>
-          </div>
-        <% } else { %>
-          <div class="empty-state">
-            <i class="fas fa-heart-broken"></i>
-            <h2>No Favorites Yet</h2>
-            <p>You haven't added any casts to your favorites yet.</p>
-            <a href="/casts" class="browse-btn">Browse Casts</a>
-          </div>
-        <% } %>
+          <% } else { %>
+            <div class="no-movies">
+              <p>You haven't added any casts to your favorites yet.</p>
+              <a href="/casts" class="btn btn-primary mt-3">Browse Casts</a>
+            </div>
+          <% } %>
+        </div>
       </div>
-    </div>
+    </section>
 
     <% if (user != null && user.role == 'admin') { %>
     <a href="/admin/:<%= user.id %>" class="sticky-button">
