@@ -147,6 +147,58 @@
       <% } %>
     </div>
 
+    <!-- Movie Recommendation Button and Interface -->
+    <% if (user && user.role === 'user') { %>
+    <button id="recommendationBtn" class="sticky-button recommendation-btn">
+      <i class="fas fa-film"></i>
+    </button>
+
+    <div id="recommendationChat" class="recommendation-chat">
+      <div class="chat-header">
+        <h5>Movie Recommendations</h5>
+        <button class="close-btn" onclick="toggleRecommendationChat()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="chat-body">
+        <div id="chatMessages" class="chat-messages">
+          <div class="message bot">
+            What kind of movies are you looking for?
+          </div>
+        </div>
+        <div class="chat-input">
+          <select id="genreSelect" class="form-select mb-2">
+            <option value="">Select Genre</option>
+            <option value="Action">Action</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Drama">Drama</option>
+            <option value="Horror">Horror</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Romance">Romance</option>
+            <option value="Thriller">Thriller</option>
+          </select>
+          <select id="timeSelect" class="form-select mb-2">
+            <option value="">Select Time Period</option>
+            <option value="recent">Recent (2020 - Present)</option>
+            <option value="2010s">2010s (2010 - 2019)</option>
+            <option value="classic">Classic (Before 2010)</option>
+          </select>
+          <button onclick="get_movie_recommendation()" class="btn btn-primary w-100">Search</button>
+        </div>
+      </div>
+      <div id="recommendationResults" class="recommendation-results">
+        <!-- Movie cards will be inserted here -->
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Admin Button -->
+    <% if (user && user.role === 'admin') { %>
+    <a href="/admin/:<%= user.id %>" class="sticky-button">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+    <% } %>
+
     <!-- Inject current user ID for JS -->
     <script>
       window.CURRENT_USER_ID = "<%= user ? (user._id || user.id) : '' %>";
@@ -280,6 +332,88 @@
       });
 
       loadComments();
+
+      // Add the recommendation function
+      window.get_movie_recommendation = async function() {
+        const genre = document.getElementById('genreSelect').value;
+        const time = document.getElementById('timeSelect').value;
+        
+        if (!genre && !time) {
+          showFunToast('Please select at least one filter (genre or time period)', 'warning');
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch recommendations');
+          }
+
+          const movie = await response.json();
+          const resultsDiv = document.getElementById('recommendationResults');
+          resultsDiv.innerHTML = '';
+
+          if (!movie) {
+            if (genre && time) {
+              showFunToast(`No movies found matching ${genre} genre from ${time} period`, 'error');
+            } else if (genre) {
+              showFunToast(`No movies found in ${genre} genre`, 'error');
+            } else if (time) {
+              showFunToast(`No movies found from ${time} period`, 'error');
+            }
+            return;
+          }
+
+          const movieCard = `
+            <div class="movie-card">
+              <img src="${movie.posterURL}" alt="${movie.title}" />
+              <div class="movie-card-rating">⭐ ${movie.rating}</div>
+              <div class="movie-card-content">
+                <div class="movie-card-title">${movie.title}</div>
+                <div class="movie-card-info">
+                  ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/movie/${movie._id}" class="movie-card-button watch-btn">
+                    <i class="fas fa-play"></i> Watch
+                  </a>
+                  <a href="/movie/${movie._id}" class="movie-card-button info-btn">
+                    <i class="fas fa-info-circle"></i> Info
+                  </a>
+                </div>
+              </div>
+            </div>
+            <button onclick="get_movie_recommendation()" class="get-another-movie">
+              <i class="fas fa-random"></i> Get Another Movie
+            </button>
+          `;
+          resultsDiv.innerHTML = movieCard;
+
+          if (genre && time) {
+            showFunToast(`Found a ${genre} movie from ${time} period!`, 'success');
+          } else if (genre) {
+            showFunToast(`Found a ${genre} movie!`, 'success');
+          } else if (time) {
+            showFunToast(`Found a movie from ${time} period!`, 'success');
+          }
+        } catch (error) {
+          console.error('Error fetching recommendations:', error);
+          showFunToast('Error: ' + error.message, 'error');
+        }
+      };
+
+      // Add toggle function for recommendation chat
+      window.toggleRecommendationChat = function() {
+        const chat = document.getElementById('recommendationChat');
+        chat.classList.toggle('active');
+        if (chat.classList.contains('active')) {
+          get_movie_recommendation();
+        }
+      };
+
+      document.getElementById('recommendationBtn')?.addEventListener('click', toggleRecommendationChat);
     </script>
   </body>
 </html>
