@@ -15,6 +15,7 @@ router.put("/:id", updateMovie);
 router.delete("/:id", deleteMovie);
 router.get("/:id", getMovieById);
 
-
+// Get movie recommendations
+router.get('/recommend', getMovieRecommendations);
 
 export default router;

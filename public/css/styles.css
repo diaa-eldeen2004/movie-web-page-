@@ -1136,4 +1136,111 @@ body {
   }
 }
 
+/* Recommendation Button and Chat Interface */
+.recommendation-btn {
+  left: 20px;
+  bottom: 20px;
+  background-color: #007bff;
+  color: white;
+  z-index: 1000;
+}
+
+.recommendation-chat {
+  position: fixed;
+  left: 20px;
+  bottom: 80px;
+  width: 350px;
+  height: 500px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.recommendation-chat.active {
+  display: flex;
+}
+
+.chat-header {
+  padding: 15px;
+  background: #007bff;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header h5 {
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.chat-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+}
+
+.message.bot {
+  background: #f0f0f0;
+  margin-right: auto;
+}
+
+.chat-input {
+  padding: 10px;
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+.recommendation-results {
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.recommendation-results .movie-card {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.recommendation-results .movie-card img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .recommendation-chat {
+    width: 90%;
+    left: 5%;
+    bottom: 70px;
+  }
+}
+
 

@@ -209,3 +209,29 @@ export const getMovieById = async (req, res) => {
   }
 };
 
+// Get movie recommendations based on genre and year
+export const getMovieRecommendations = async (req, res) => {
+  try {
+    const { genre, year } = req.query;
+
+    if (!genre || !year) {
+      return res.status(400).json({ message: 'Genre and year are required' });
+    }
+
+    const movies = await Movie.find({
+      genre: genre,
+      releasedate: {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(parseInt(year) + 1, 0, 1)
+      }
+    })
+    .sort({ rating: -1 })
+    .limit(5);
+
+    res.json(movies);
+  } catch (error) {
+    console.error('Error getting movie recommendations:', error);
+    res.status(500).json({ message: 'Error getting movie recommendations' });
+  }
+};
+
