@@ -20,10 +20,13 @@ const castSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  photoURL: {
+    type: String,
+    trim: true
+  },
   profileImageURL: {
     type: String,
-    required: true,
-    trim: true,
+    trim: true
   },
   movies: [{
     type: mongoose.Schema.Types.ObjectId,

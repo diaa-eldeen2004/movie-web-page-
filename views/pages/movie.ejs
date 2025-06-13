@@ -88,12 +88,16 @@
                 <% movie.cast.forEach(castMember => { %>
                   <a href="/cast/<%= castMember._id %>" class="text-decoration-none">
                     <div class="cast-card text-center">
-                      <img
-                        src="<%= castMember.photoURL || castMember.profileImageURL %>"
-                        alt="<%= castMember.name %>"
-                        class="rounded-circle mb-2"
-                      />
-                      <small class="text-light d-block"><%= castMember.name %></small>
+                      <div class="cast-image-wrapper" style="width: 80px; height: 80px; margin: 0 auto;">
+                        <img
+                          src="<%= castMember.photoURL || castMember.profileImageURL %>"
+                          alt="<%= castMember.name %>"
+                          class="rounded-circle"
+                          style="width: 100%; height: 100%; object-fit: cover;"
+                          loading="lazy"
+                        />
+                      </div>
+                      <small class="text-light d-block mt-2"><%= castMember.name %></small>
                     </div>
                   </a>
                 <% }) %>
