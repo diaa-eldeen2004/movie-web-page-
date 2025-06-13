@@ -49,15 +49,20 @@ router.use(async (req, res, next) => {
 router.get("/", getIndex);
 router.get("/contact", getcontact);
 router.get("/movies", getmovies);
-
 router.get("/mylist", auth(), getWatchlist);
-
 router.get("/casts", getALLCasts);
-router.get("/settings", getsettings);
+router.get("/cast/:id", getCastDetail);
+router.get("/movie/:id", getMovieDetail);
+router.get("/mylist", auth(), getMyList);
+router.get("/profile", auth(), getProfile);
+router.get("/contact", getContact);
 router.get("/login", getlogin);
 router.get("/signup", getsignup);
 router.get("/2fapage", get2fa);
 router.get("/forgetpassword", getfrogetpassword);
+
+
+// Protected routes
 router.get("/admin/:id", auth(["admin"]), getAdmin);
 router.get("/addMovie", auth(["admin"]), getAddMovie);
 router.get("/adduser", auth(["admin"]), getAddUser);
