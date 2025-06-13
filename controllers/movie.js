@@ -48,7 +48,8 @@ export const createMovie = async (req, res) => {
             birthdate: new Date(), // Placeholder
             nationality: "Unknown",
             description: "No description provided.",
-            profileImageURL: "https://default-profile.com/image.jpg",
+            photoURL: '/images/default-cast.jpg',
+            profileImageURL: '/images/default-cast.jpg'
           });
           await existing.save();
         }
@@ -165,8 +166,12 @@ export const deleteMovie = async (req, res) => {
 // Get movie by ID (with populated cast and related movies)
 export const getMovieById = async (req, res) => {
   try {
-    // Find movie and populate cast details
-    const movie = await Movie.findById(req.params.id).populate("cast");
+    // Find movie and populate cast details with all necessary fields
+    const movie = await Movie.findById(req.params.id).populate({
+      path: "cast",
+      select: "name photoURL profileImageURL birthdate nationality description _id",
+      options: { lean: true } // Use lean() for better performance
+    });
 
     if (!movie) {
       return res.status(404).send("Movie not found");
