@@ -196,7 +196,7 @@ export const getMovieById = async (req, res) => {
       relatedMovies, 
       inList,
       comments,
-      user: req.user 
+      user: res.locals.user // Use res.locals.user for EJS templates
     });
   } catch (err) {
     console.error("Error fetching movie:", err);

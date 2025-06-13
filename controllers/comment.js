@@ -19,6 +19,7 @@ export const getMovieComments = async (req, res) => {
   try {
     // Populate both name and _id so frontend can check ownership
     const comments = await Comment.find({ movie: req.params.movieId }).populate("user", "name _id");
+    console.log('DEBUG: Returning comments for movie', req.params.movieId, comments);
     res.json(comments);
   } catch (error) {
     res.status(500).json({ message: "Error fetching comments", error: error.message });

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= movie.title %> - Movie Website</title>
+    <title><%= movie.title %> - Details</title>
 
     <!-- Bootstrap CSS -->
     <link
@@ -33,13 +33,13 @@
     <!-- Navbar -->
     <%- include('../partials/navbar.ejs') %>
 
-    <!-- Movie Detail Section -->
+    <!-- IMDb-Inspired Movie Detail Section -->
     <section class="container my-5 pt-5 d-flex justify-content-center">
-      <div class="movie-detail-section">
+      <div class="movie-detail-section w-100">
         <!-- Trailer on the left -->
-        <div class="trailer-embed">
+        <div class="trailer-embed d-flex justify-content-center align-items-start flex-column">
           <% if (movie.trailerURL) { %>
-          <div class="ratio ratio-16x9">
+          <div class="ratio ratio-16x9 w-100">
             <iframe
               src="<%= movie.trailerURL.replace('watch?v=', 'embed/') %>"
               title="Trailer"
@@ -48,101 +48,107 @@
             ></iframe>
           </div>
           <% } %>
-          <div class="description mt-4"><%= movie.description %></div>
+          <div class="description mt-4"> <%= movie.description %> </div>
         </div>
 
         <!-- Poster and info on the right -->
-        <div class="movie-info">
+        <div class="d-flex flex-column align-items-center w-100">
           <img
             src="<%= movie.posterURL %>"
             alt="<%= movie.title %> poster"
-            class="movie-image"
+            class="img-fluid mb-3"
           />
-          <h1 class="movie-title"><%= movie.title %></h1>
-          <div class="movie-details">
-            <div class="movie-detail">
-              <i class="fa-solid fa-calendar"></i>
-              <span><%= new Date(movie.releasedate).getFullYear() %></span>
-            </div>
-            <div class="movie-detail">
-              <i class="fa-solid fa-clock"></i>
-              <span><%= movie.duration %> min</span>
-            </div>
-            <div class="movie-detail">
-              <i class="fa-solid fa-film"></i>
-              <span><%= movie.genre.join(', ') %></span>
-            </div>
-            <div class="movie-detail">
-              <i class="fa-solid fa-star"></i>
-              <span><%= movie.rating %></span>/10
-            </div>
+          <h1 class="text-center mb-3"> <%= movie.title %> </h1>
+          <div class="meta d-flex flex-column align-items-center mb-3">
+            <span><i class="fa-solid fa-calendar"></i> <%= new Date(movie.releasedate).getFullYear() %></span>
+            <span><i class="fa-solid fa-clock"></i> <%= movie.duration %> min</span>
+            <span><i class="fa-solid fa-film"></i> <%= movie.genre.join(', ') %></span>
+            <span><i class="fa-solid fa-star"></i> <span style='color:#f5c518'><%= movie.rating %></span>/10</span>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="action-buttons">
-            <a href="#" class="action-button watch-now">
-              <i class="fas fa-play"></i> Watch Now
-            </a>
-            <% if (movie.trailerURL) { %>
-            <a href="<%= movie.trailerURL %>" class="action-button trailer" target="_blank">
-              <i class="fas fa-film"></i> Trailer
-            </a>
-            <% } %>
+          <!-- Cast Circle Cards -->
+          <% if (movie.cast && movie.cast.length > 0) { %>
+            <div class="cast-section mt-4 w-100 text-center">
+              <h4 class="text-light mb-3">Cast</h4>
+              <div class="d-flex flex-wrap justify-content-center gap-3">
+                <% movie.cast.forEach(castMember => { %>
+                  <div class="cast-card text-center">
+                    <img
+                      src="<%= castMember.photoURL %>"
+                      alt="<%= castMember.name %>"
+                      class="rounded-circle mb-2"
+                    />
+                    <small class="text-light d-block"><%= castMember.name %></small>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
+          <% } %>
+
+          <% if (user) { %>
+          <div class="my-2 text-center">
+            <button 
+              class="btn save-to-list"
+              data-movie-id="<%= movie._id %>">
+              <i class="fas fa-heart"></i> Add to Watchlist
+            </button>
           </div>
+          <% } %>
         </div>
       </div>
     </section>
 
-    <!-- Cast Section -->
-    <% if (movie.cast && movie.cast.length > 0) { %>
-    <section class="cast-section container">
-      <h3>Cast</h3>
-      <div class="cast-grid">
-        <% movie.cast.forEach(cast => { %>
-        <div class="cast-card">
-          <img src="<%= cast.imageURL %>" alt="<%= cast.name %>" class="cast-image" />
-          <div class="cast-info">
-            <h4 class="cast-name"><%= cast.name %></h4>
-            <p class="cast-role"><%= cast.role %></p>
-          </div>
+    <!-- You May Like Section -->
+    <% if (relatedMovies && relatedMovies.length > 0) { %>
+      <section class="you-may-like-section container my-5">
+        <h2>You May Like</h2>
+        <div class="row">
+          <% relatedMovies.forEach(similar => { %>
+            <div class="col-6 col-sm-4 col-md-3 mb-4">
+              <a href="/api/movies/<%= similar._id %>" class="text-decoration-none">
+                <div class="card h-100">
+                  <img
+                    src="<%= similar.posterURL %>"
+                    class="card-img-top"
+                    alt="<%= similar.title %> poster"
+                  />
+                  <div class="card-body text-center">
+                    <h6 class="card-title"><%= similar.title %></h6>
+                  </div>
+                </div>
+              </a>
+            </div>
+          <% }) %>
         </div>
-        <% }) %>
-      </div>
-    </section>
+      </section>
     <% } %>
 
-    <!-- Comments Section -->
-    <section class="comments-section container">
-      <h3>Comments</h3>
+    <div id="comments-section" class="container my-5">
+      <h3 class="text-light">User Reviews</h3>
+      <div id="comments-list" class="mb-3"></div>
       <% if (user) { %>
-      <form class="comment-form">
-        <textarea placeholder="Write your comment..."></textarea>
-        <button type="submit">Post Comment</button>
-      </form>
+        <form id="commentForm">
+          <textarea name="text" required placeholder="Write your review..."></textarea>
+          <input type="number" name="rating" min="1" max="10" required placeholder="Rating (1-10)">
+          <button type="submit">Submit</button>
+        </form>
+      <% } else { %>
+        <p>Please <a href="/login">login</a> to post a comment.</p>
       <% } %>
-      <div class="comment-list">
-        <% if (comments && comments.length > 0) { %>
-          <% comments.forEach(comment => { %>
-          <div class="comment">
-            <div class="comment-header">
-              <span class="comment-user"><%= comment.user.name %></span>
-              <span class="comment-date"><%= new Date(comment.createdAt).toLocaleDateString() %></span>
-            </div>
-            <p class="comment-content"><%= comment.content %></p>
-          </div>
-          <% }) %>
-        <% } else { %>
-          <p>No comments yet. Be the first to comment!</p>
-        <% } %>
-      </div>
-    </section>
+    </div>
 
+    <!-- Inject current user ID for JS -->
+    <script>
+      window.CURRENT_USER_ID = "<%= user ? (user._id || user.id) : '' %>";
+    </script>
+
+    <!-- Footer -->
     <%- include('../partials/footer.ejs') %>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
 
+    <!-- Custom JS -->
     <script type="module" src="/js/script.js"></script>
 
     <script type="module">
@@ -172,20 +178,36 @@
       const movieId = "<%= movie._id %>";
 
       async function loadComments() {
-        const res = await fetch(`/api/comments/movie/${movieId}`);
-        const comments = await res.json();
-        const list = document.getElementById("comments-list");
-        list.innerHTML = comments
-          .map(c => {
-    const isOwner = c.user._id === "<%= user?.id %>"; // Only show delete button for comment owner
-    return `
-      <div class="comment-box mb-3 p-2 border rounded text-light" style="background:#222;">
-        <strong>${c.user.name}</strong> rated ${c.rating}/10
-        <p>${c.text}</p>
-        ${isOwner ? `<button class="btn btn-sm btn-danger delete-comment-btn" data-id="${c._id}"><i class="fas fa-trash"></i> Delete</button>` : ''}
-      </div>`;
-  })
-  .join("");
+        try {
+          const res = await fetch(`/api/comments/movie/${movieId}`);
+          if (!res.ok) {
+            document.getElementById("comments-list").innerHTML = '<div class="text-danger">Failed to load comments.</div>';
+            return;
+          }
+          let comments = await res.json();
+          // If backend returns {comments: [...]}, extract the array
+          if (comments && comments.comments) comments = comments.comments;
+          console.log('DEBUG: Comments loaded', comments); // Debug log
+          const list = document.getElementById("comments-list");
+          if (!Array.isArray(comments) || comments.length === 0) {
+            list.innerHTML = '<div class="text-muted">No comments yet.</div>';
+            return;
+          }
+          list.innerHTML = comments
+            .map(c => {
+              const isOwner = c.user._id === window.CURRENT_USER_ID;
+              return `
+                <div class="comment-box mb-3 p-2 border rounded text-light position-relative">
+                  ${isOwner ? `<button class=\"btn btn-sm btn-danger delete-comment-btn position-absolute\" style=\"top:0.4rem;right:0.4rem;padding:0.2rem 0.5rem;font-size:1rem;z-index:2;\" data-id=\"${c._id}\"><i class=\"fas fa-trash\"></i></button>` : ''}
+                  <div class="comment-username" style="font-size:0.98rem;color:#f5c518;margin-bottom:0.3rem;font-weight:600;text-align:center;">${c.user.name}</div>
+                  <div class="star-rating"><i class="fa-solid fa-star"></i> ${c.rating}</div>
+                  <p>${c.text}</p>
+                </div>`;
+            })
+            .join("");
+        } catch (err) {
+          document.getElementById("comments-list").innerHTML = '<div class="text-danger">Error loading comments.</div>';
+        }
       }
       
       document.addEventListener("click", async (e) => {
@@ -215,22 +237,26 @@
         const text = form.text.value.trim();
         const rating = parseInt(form.rating.value);
 
-        const res = await fetch(`/api/comments/${movieId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ text, rating }),
-        });
+        try {
+          const res = await fetch(`/api/comments/${movieId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ text, rating }),
+          });
 
-        const data = await res.json();
-        showFunToast(data.message || "✅ Comment added", "linear-gradient(to right, #00eaff, #00a8b5)");
-        loadComments();
+          const data = await res.json();
+          showFunToast(data.message || "✅ Comment added", "linear-gradient(to right, #00eaff, #00a8b5");
+          if (res.ok) {
+            form.reset(); // Clear the form after successful submit
+            await loadComments(); // Ensure comments are refreshed after submit
+          }
+        } catch (err) {
+          showFunToast("❗ Network error", "red");
+        }
       });
 
       loadComments();
     </script>
-
-    <script src="/js/movie.js"></script>
-
   </body>
 </html>
