@@ -151,5 +151,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Open source community
 
 ---
-
-Made with ❤️ by [Your Name]
