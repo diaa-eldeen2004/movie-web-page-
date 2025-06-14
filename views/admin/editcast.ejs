@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>" />
+    <title>Edit Cast Member - X-System</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: rgb(0, 0, 0);
+        color: white;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+      }
+
+      .header i {
+        font-size: 2rem;
+        color: #00eaff;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        background: linear-gradient(to right, #00eaff, #00a8b5);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #00eaff;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      input[type="url"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #00eaff;
+        box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .submit-btn {
+        background: linear-gradient(to right, #00eaff, #00a8b5);
+        color: #000;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 234, 255, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <i class="fas fa-user"></i>
+        <h1>Edit Cast Member</h1>
+      </div>
+
+      <form id="addCastForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" value="<%= cast.name %>" />
+          </div>
+
+          <div class="form-group">
+            <label for="birthdate">Birthdate</label>
+            <input
+              type="date"
+              id="birthdate"
+              name="birthdate"
+              value="<%= new Date(cast.birthdate).toISOString().slice(0, 10) %>"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="nationality">Nationality</label>
+            <input
+              type="text"
+              id="nationality"
+              name="nationality"
+              value="<%= cast.nationality %>"
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="description">Description</label>
+            <textarea id="description" name="description">
+<%= cast.description %></textarea
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="profileImageURL">Profile Image URL</label>
+            <input
+              type="url"
+              id="profileImageURL"
+              name="profileImageURL"
+              value="<%= cast.profileImageURL %>"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="movies">Movie Names (comma-separated, optional)</label>
+            <input
+              type="text"
+              id="movies"
+              name="movies"
+              placeholder="e.g. Inception, Titanic"
+              value="<%= cast.movies.map(movie => movie.title).join(', ') %>"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-save"></i> Edit Cast
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
+
+<script type="module">
+  import showFunToast from "/js/toast.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("#addCastForm");
+
+    const nameInput = document.querySelector('input[name="name"]');
+    const birthdateInput = document.querySelector('input[name="birthdate"]');
+    const nationalityInput = document.querySelector('input[name="nationality"]');
+    const descriptionInput = document.querySelector('textarea[name="description"]');
+    const profileImageURLInput = document.querySelector('input[name="profileImageURL"]');
+    const moviesInput = document.querySelector('input[name="movies"]');
+
+    const castId = "<%= cast._id %>";
+
+    const originalValues = {
+      name: nameInput.value,
+      birthdate: birthdateInput.value,
+      nationality: nationalityInput.value,
+      description: descriptionInput.value.trim(),
+      profileImageURL: profileImageURLInput.value,
+      movies: moviesInput.value,
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = nameInput.value.trim();
+      const birthdate = birthdateInput.value;
+      const nationality = nationalityInput.value.trim();
+      const description = descriptionInput.value.trim();
+      const profileImageURL = profileImageURLInput.value.trim();
+      const movies = moviesInput.value.trim().split(",").map(m => m.trim()).filter(Boolean);
+
+      if (!name || !birthdate || !nationality || !description || !profileImageURL) {
+        return showFunToast("❌ Please fill in all required fields.", "red");
+      }
+
+      const hasChanged =
+        name !== originalValues.name ||
+        birthdate !== originalValues.birthdate ||
+        nationality !== originalValues.nationality ||
+        description !== originalValues.description ||
+        profileImageURL !== originalValues.profileImageURL ||
+        movies.join(",") !== originalValues.movies;
+
+      if (!hasChanged) {
+        return showFunToast("ℹ️ No changes detected.", "orange");
+      }
+
+      const payload = {
+        name,
+        birthdate,
+        nationality,
+        description,
+        profileImageURL,
+        movies, // list of movie names
+      };
+
+      try {
+        const response = await fetch(`/api/cast/${castId}`, {
+          method: "PUT",
+          credentials: 'include',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showFunToast(result.message, "linear-gradient(to right, #00eaff, #00a8b5)");
+          setTimeout(() => {
+            window.location.href = "/admin/:id";
+          }, 1500);
+        } else {
+          showFunToast(result.message, "red");
+        }
+      } catch (error) {
+        console.error("Update error:", error);
+        showFunToast("❌ Server error occurred", "red");
+      }
+    });
+  });
+</script>

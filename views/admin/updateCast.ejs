@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>" />
+    <title>Edit Cast Member - X-System</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: rgb(0, 0, 0);
+        color: white;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+      }
+
+      .header i {
+        font-size: 2rem;
+        color: #00eaff;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        background: linear-gradient(to right, #00eaff, #00a8b5);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #00eaff;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      input[type="url"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #00eaff;
+        box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .submit-btn {
+        background: linear-gradient(to right, #00eaff, #00a8b5);
+        color: #000;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 234, 255, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <i class="fas fa-user-edit"></i>
+        <h1>Edit Cast Member: <%= cast.name %></h1>
+      </div>
+
+      <form id="editCastForm" action="/cast/<%= cast._id %>?_method=PUT" method="POST">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" value="<%= cast.name %>" />
+          </div>
+
+          <div class="form-group">
+            <label for="birthdate">Birthdate</label>
+            <input type="date" id="birthdate" name="birthdate" value="<%= cast.birthdate.toISOString().split('T')[0] %>" />
+          </div>
+
+          <div class="form-group">
+            <label for="nationality">Nationality</label>
+            <input type="text" id="nationality" name="nationality" value="<%= cast.nationality %>" />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="description">Description</label>
+            <textarea id="description" name="description"><%= cast.description %></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="profileImageURL">Profile Image URL</label>
+            <input type="url" id="profileImageURL" name="profileImageURL" value="<%= cast.profileImageURL %>" />
+          </div>
+
+          <div class="form-group">
+            <label for="movies">Movie IDs (comma-separated, optional)</label>
+            <input type="text" id="movies" name="movies" value="<%= cast.movies.join(', ') %>" />
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </form>
+    </div>
+
+    <script type="module">
+      import showFunToast from "/js/toast.js";
+
+      document.getElementById("editCastForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value.trim();
+        const birthdate = document.getElementById("birthdate").value.trim();
+        const nationality = document.getElementById("nationality").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const profileImageURL = document.getElementById("profileImageURL").value.trim();
+        const movies = document.getElementById("movies").value.trim().split(",").map(id => id.trim()).filter(id => id);
+
+        if (!name || !birthdate || !nationality || !description || !profileImageURL) {
+          return showFunToast("❗ All fields are required", "red");
+        }
+
+        const data = {
+          name,
+          birthdate,
+          nationality,
+          description,
+          profileImageURL,
+          movies: movies.length ? movies : [],
+        };
+
+        try {
+          const response = await fetch(`/cast/${encodeURIComponent("<%= cast._id %>")}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          const responseData = await response.json();
+
+          if (response.ok) {
+            showFunToast("✅ Cast member updated successfully!", "linear-gradient(to right, #00eaff, #00a8b5)");
+            setTimeout(() => {
+              window.location.href = "/admin/:id"; // Adjust redirect as needed
+            }, 1500);
+          } else {
+            showFunToast(responseData.error || "❗ Failed to update cast member", "red");
+          }
+        } catch (error) {
+          showFunToast(error.message || "❗ Server error", "red");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>" />
+    <title>YMD - Cast</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- Icons CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/casts.css" />
+  </head>
+  <body>
+    <%- include('../partials/navbar.ejs') %>
+
+    <!-- Hero Section -->
+    <% if (sliderCasts && sliderCasts.length > 0) { %>
+    <section class="hero-section">
+      <div
+        id="castCarousel"
+        class="carousel slide custom-carousel"
+        data-bs-ride="carousel"
+        data-bs-interval="5000"
+      >
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+          <% sliderCasts.forEach((_, i) => { %>
+          <button
+            type="button"
+            data-bs-target="#castCarousel"
+            data-bs-slide-to="<%= i %>"
+            class="<%= i === 0 ? 'active' : '' %>"
+            aria-current="<%= i === 0 ? 'true' : 'false' %>"
+            aria-label="Slide <%= i + 1 %>"
+          ></button>
+          <% }) %>
+        </div>
+
+        <!-- Slides -->
+        <div class="carousel-inner">
+          <% sliderCasts.forEach((cast, i) => { %>
+          <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+            <img
+              src="<%= cast.profileImageURL || 'https://via.placeholder.com/1280x720' %>"
+              class="d-block w-100"
+              alt="<%= cast.name %>"
+            />
+            <div class="hero-content">
+              <h1><%= cast.name %></h1>
+              <div class="metadata">
+                <span><%= new Date(cast.birthdate).toLocaleDateString() %></span> |
+                <span><%= cast.nationality %></span>
+              </div>
+              <p class="description"><%= cast.description || 'No description available' %></p>
+              <div class="action-buttons">
+                <a href="/cast/<%= cast._id %>" class="action-button watch-now">
+                  <i class="fas fa-user"></i> View Profile
+                </a>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+
+        <!-- Arrows -->
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#castCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#castCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </section>
+    <% } else { %>
+    <section
+      class="hero-section d-flex justify-content-center align-items-center"
+      style="height: 60vh; background-color: #000"
+    >
+      <h2 style="color: white">No featured cast members in slider yet</h2>
+    </section>
+    <% } %>
+
+    <!-- Cast Sections -->
+    <section class="movie-section">
+      <!-- Trending Movies' Casts -->
+      <h2 class="category-title">Trending Movies' Casts</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (trendingCasts && trendingCasts.length > 0) { %>
+            <% trendingCasts.forEach(cast => { %>
+            <div class="movie-card">
+              <img src="<%= cast.profileImageURL || 'https://via.placeholder.com/200' %>" alt="<%= cast.name %>" />
+              <div class="movie-card-content">
+                <div class="movie-card-title"><%= cast.name %></div>
+                <div class="movie-card-info">
+                  <%= new Date(cast.birthdate).toLocaleDateString() %> • <%= cast.nationality %>
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/cast/<%= cast._id %>" class="movie-card-button watch-btn">
+                    <i class="fas fa-user"></i> View
+                  </a>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          <% } else { %>
+            <div class="no-movies">
+              <p>No casts from trending movies at the moment.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Born Today -->
+      <h2 class="category-title">Born Today</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (bornToday && bornToday.length > 0) { %>
+            <% bornToday.forEach(cast => { %>
+            <div class="movie-card">
+              <img src="<%= cast.profileImageURL || 'https://via.placeholder.com/200' %>" alt="<%= cast.name %>" />
+              <div class="movie-card-content">
+                <div class="movie-card-title"><%= cast.name %></div>
+                <div class="movie-card-info">
+                  <%= new Date(cast.birthdate).toLocaleDateString() %> • <%= cast.nationality %>
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/cast/<%= cast._id %>" class="movie-card-button watch-btn">
+                    <i class="fas fa-user"></i> View
+                  </a>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          <% } else { %>
+            <div class="no-movies">
+              <p>No cast members born today.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Total Casts -->
+      <h2 class="category-title">Total Casts</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (allCast && allCast.length > 0) { %>
+            <% allCast.forEach(cast => { %>
+            <div class="movie-card">
+              <img src="<%= cast.profileImageURL || 'https://via.placeholder.com/200' %>" alt="<%= cast.name %>" />
+              <div class="movie-card-content">
+                <div class="movie-card-title"><%= cast.name %></div>
+                <div class="movie-card-info">
+                  <%= new Date(cast.birthdate).toLocaleDateString() %> • <%= cast.nationality %>
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/cast/<%= cast._id %>" class="movie-card-button watch-btn">
+                    <i class="fas fa-user"></i> View
+                  </a>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          <% } else { %>
+            <div class="no-movies">
+              <p>No cast members available.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    
+    <% if (user != null && user.role == 'admin') { %>
+    <a href="/admin/:<%= user.id %>" class="sticky-button">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+    <% } %> <%- include('../partials/footer.ejs') %>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="/js/script.js"></script>
+  </body>
+</html>

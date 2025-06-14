@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>" />
+    <title>YMD</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/css/styles.css" />
+     <link rel="stylesheet" href="/css/footer.css" />
+    <!-- Icons CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <%- include('../partials/navbar.ejs') %>
+    <%- include('../partials/trailer-modal.ejs') %>
+
+    <!-- Hero Section -->
+    <% if (sliderMovies && sliderMovies.length > 0) { %>
+    <section class="hero-section">
+      <div
+        id="mainCarousel"
+        class="carousel slide custom-carousel"
+        data-bs-ride="carousel"
+        data-bs-interval="5000"
+      >
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+          <% sliderMovies.forEach((_, i) => { %>
+          <button
+            type="button"
+            data-bs-target="#mainCarousel"
+            data-bs-slide-to="<%= i %>"
+            class="<%= i === 0 ? 'active' : '' %>"
+            aria-current="<%= i === 0 ? 'true' : 'false' %>"
+            aria-label="Slide <%= i + 1 %>"
+          ></button>
+          <% }) %>
+        </div>
+
+        <!-- Slides -->
+        <div class="carousel-inner">
+          <% sliderMovies.forEach((movie, i) => { %>
+          <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+            <img
+              src="<%= movie.posterURL %>"
+              class="d-block w-100"
+              alt="<%= movie.title %>"
+            />
+            <div class="hero-content">
+              <h1><%= movie.title %></h1>
+              <div class="metadata">
+                <span>⭐ <%= movie.rating %></span> |
+                <span><%= movie.genre.join(', ') %></span> |
+                <span><%= movie.duration %> min</span>
+              </div>
+              <p class="description"><%= movie.description %></p>
+              <div class="action-buttons">
+                <a
+                  href="/api/movies/<%= movie._id %>"
+                  class="action-button watch-now"
+                >
+                <i class="fas fa-info-circle"></i> info
+                </a>
+                <% if (movie.trailerURL) { %>
+                <a
+                  href="<%= movie.trailerURL %>"
+                  class="action-button trailer"
+                  target="_blank"
+                >
+                  <i class="fas fa-film"></i> Trailer
+                </a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+
+        <!-- Arrows -->
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#mainCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#mainCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </section>
+    <% } else { %>
+    <section
+      class="hero-section d-flex justify-content-center align-items-center"
+      style="height: 60vh; background-color: #000"
+    >
+      <h2 style="color: white">No featured movies in slider yet</h2>
+    </section>
+    <% } %>
+
+    <!-- Trending Now -->
+    <section class="movie-section">
+      <h2 class="category-title">Trending Now</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (trendingMovies && trendingMovies.length > 0) { %> <%
+          trendingMovies.forEach(movie => { %>
+          <div class="movie-card">
+            <img src="<%= movie.posterURL %>" alt="<%= movie.title %>" />
+            <div class="movie-card-rating">⭐ <%= movie.rating %></div>
+            <div class="movie-card-content">
+              <div class="movie-card-title"><%= movie.title %></div>
+              <div class="movie-card-info">
+                <%= movie.releaseYear %> • <%= movie.genre.join(', ') %>
+              </div>
+              <div class="movie-card-buttons">
+                <a
+                  href="/movie/<%= movie._id %>"
+                  class="movie-card-button info-btn"
+                >
+                  <i class="fas fa-info-circle"></i> Info
+                </a>
+              </div>
+            </div>
+          </div>
+          <% }) %> <% } else { %>
+          <div class="no-movies">
+            <p>No trending movies at the moment.</p>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- New Releases -->
+      <h2 class="category-title">New Releases</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (newReleaseMovies && newReleaseMovies.length > 0) { %> <%
+          newReleaseMovies.forEach(movie => { %>
+          <div class="movie-card">
+            <img src="<%= movie.posterURL %>" alt="<%= movie.title %>" />
+            <div class="movie-card-rating">⭐ <%= movie.rating %></div>
+            <div class="movie-card-content">
+              <div class="movie-card-title"><%= movie.title %></div>
+              <div class="movie-card-info">
+                <%= movie.releaseYear %> • <%= movie.genre.join(', ') %>
+              </div>
+              <div class="movie-card-buttons">
+                <a
+                  href="/movie/<%= movie._id %>"
+                  class="movie-card-button info-btn"
+                >
+                  <i class="fas fa-info-circle"></i> Info
+                </a>
+              </div>
+            </div>
+          </div>
+          <% }) %> <% } else { %>
+          <div class="no-movies">
+            <p>No new releases available.</p>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Button -->
+    <% if (user && user.role === 'admin') { %>
+    <a href="/admin/:<%= user.id %>" class="sticky-button">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+    <% } else if (user && user.role === 'user') { %>
+    <!-- Movie Recommendation Button and Interface -->
+    <button id="recommendationBtn" class="sticky-button recommendation-btn">
+      <i class="fas fa-film"></i>
+    </button>
+
+    <div id="recommendationChat" class="recommendation-chat">
+      <div class="chat-header">
+        <h5>Movie Recommendations</h5>
+        <button class="close-btn" onclick="toggleRecommendationChat()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="chat-body">
+        <div id="chatMessages" class="chat-messages">
+          <div class="message bot">
+            What kind of movies are you looking for?
+          </div>
+        </div>
+        <div class="chat-input">
+          <select id="genreSelect" class="form-select mb-2">
+            <option value="">Select Genre</option>
+            <option value="Action">Action</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Drama">Drama</option>
+            <option value="Horror">Horror</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Romance">Romance</option>
+            <option value="Thriller">Thriller</option>
+          </select>
+          <select id="timeSelect" class="form-select mb-2">
+            <option value="">Select Time Period</option>
+            <option value="recent">Recent (2020 - Present)</option>
+            <option value="2010s">2010s (2010 - 2019)</option>
+            <option value="classic">Classic (Before 2010)</option>
+          </select>
+          <button onclick="get_movie_recommendation()" class="btn btn-primary w-100">Search</button>
+        </div>
+      </div>
+      <div id="recommendationResults" class="recommendation-results">
+        <!-- Movie cards will be inserted here -->
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Cast Section -->
+    <section class="movie-section">
+      <h2 class="category-title">Popular Cast</h2>
+      <div class="row-container">
+        <button class="slider-button prev" onclick="slideRow(this, -1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-button next" onclick="slideRow(this, 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="movie-row">
+          <% if (casts && casts.length > 0) { %>
+            <% casts.forEach(cast => { %>
+              <div class="index-cast-card">
+                <a href="/cast/<%= cast._id %>" class="index-cast-link">
+                  <div class="index-cast-image-container">
+                    <img src="<%= cast.photoURL || cast.profileImageURL || '/images/default-cast.jpg' %>" alt="<%= cast.name %>" class="index-cast-image" />
+                  </div>
+                  <div class="index-cast-name"><%= cast.name %></div>
+                </a>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="no-movies">
+              <p>No cast members available.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Toastify CSS and JS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="/js/script.js"></script>
+    <script>
+      function showfun(msg, type) {
+        const colors = {
+          error: '#ff4444',
+          success: '#00C851',
+          info: '#33b5e5',
+          warning: '#ffbb33'
+        };
+        
+        Toastify({
+          text: msg,
+          duration: 3000,
+          close: true,
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: colors[type] || colors.info,
+            color: "#fff",
+            fontWeight: "bold",
+            fontFamily: "Poppins",
+          },
+          stopOnFocus: true,
+        }).showToast();
+      }
+
+      function toggleRecommendationChat() {
+        const chat = document.getElementById('recommendationChat');
+        chat.classList.toggle('active');
+        if (chat.classList.contains('active')) {
+          get_movie_recommendation();
+        }
+      }
+
+      document.getElementById('recommendationBtn').addEventListener('click', toggleRecommendationChat);
+
+      async function get_movie_recommendation() {
+        const genre = document.getElementById('genreSelect').value;
+        const time = document.getElementById('timeSelect').value;
+        
+        if (!genre && !time) {
+          showfun('Please select at least one filter (genre or time period)', 'warning');
+          return;
+        }
+
+        try {
+          // Log the request parameters
+          console.log('Requesting with params:', { genre, time });
+          
+          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
+          
+          // Log the response status
+          console.log('Response status:', response.status);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('API Error:', errorData);
+            throw new Error(errorData.message || 'Failed to fetch recommendations');
+          }
+
+          const movie = await response.json();
+          
+          // Log the received movie data
+          console.log('Received movie:', movie);
+          
+          const resultsDiv = document.getElementById('recommendationResults');
+          resultsDiv.innerHTML = '';
+
+          if (!movie) {
+            if (genre && time) {
+              showfun(`No movies found matching ${genre} genre from ${time} period`, 'error');
+            } else if (genre) {
+              showfun(`No movies found in ${genre} genre`, 'error');
+            } else if (time) {
+              showfun(`No movies found from ${time} period`, 'error');
+            }
+            return;
+          }
+
+          const movieCard = `
+            <div class="movie-card">
+              <img src="${movie.posterURL}" alt="${movie.title}" />
+              <div class="movie-card-rating">⭐ ${movie.rating}</div>
+              <div class="movie-card-content">
+                <div class="movie-card-title">${movie.title}</div>
+                <div class="movie-card-info">
+                  ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
+                </div>
+                <div class="movie-card-buttons">
+                  <a
+                    href="/movie/${movie._id}"
+                    class="movie-card-button info-btn"
+                  >
+                    <i class="fas fa-info-circle"></i> Info
+                  </a>
+                </div>
+              </div>
+            </div>
+            <button onclick="get_movie_recommendation()" class="get-another-movie">
+              <i class="fas fa-random"></i> Get Another Movie
+            </button>
+          `;
+          resultsDiv.innerHTML = movieCard;
+
+          // Show success message based on filters used
+          if (genre && time) {
+            showfun(`Found a ${genre} movie from ${time} period!`, 'success');
+          } else if (genre) {
+            showfun(`Found a ${genre} movie!`, 'success');
+          } else if (time) {
+            showfun(`Found a movie from ${time} period!`, 'success');
+          }
+        } catch (error) {
+          console.error('Error fetching recommendations:', error);
+          showfun('Error: ' + error.message, 'error');
+        }
+      }
+    </script>
+  </body>
+</html>

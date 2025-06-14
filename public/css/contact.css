@@ -1,0 +1,99 @@
+.contact-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    margin-top: 8rem;
+    position: relative;
+    z-index: 1;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 1rem;
+    margin-top: 5rem;
+}
+
+.contact-description {
+    text-align: center;
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+    width: 100%;
+}
+
+.contact-item:hover {
+    transform: translateY(-5px);
+}
+
+.contact-item i {
+    font-size: 2rem;
+    color: #007bff;
+    margin-right: 1.5rem;
+}
+
+.contact-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.contact-box span {
+    font-size: 1.1rem;
+    color: white;
+}
+
+.copy-icon {
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.copy-icon:hover {
+    color: #007bff;
+}
+
+@media (max-width: 768px) {
+    .contact-items {
+        padding: 0 1rem;
+    }
+    
+    .contact-item {
+        padding: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .contact-description {
+        font-size: 1rem;
+    }
+} 
