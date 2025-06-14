@@ -1,0 +1,135 @@
+<!-- Horizontal Navbar -->
+
+<nav class="bignavbar" id="mainNavbar">
+  <div class="navbar-left">
+    <button
+      class="navbar-toggle"
+      id="navbar-toggle"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="navbar-link">
+      <a href="/"><i class="fas fa-tv"></i></a>
+    </div>
+  </div>
+
+  <div class="navbar-center">
+    <a href="/" class="menu-list-item"
+      ><i class="fa-solid fa-chart-simple"></i> Home</a
+    >
+    <a href="/movies" class="menu-list-item"
+      ><i class="fa-solid fa-film"></i> Movies</a
+    >
+    <a href="/casts" class="menu-list-item"
+      ><i class="fas fa-users"></i> casts</a
+    >
+    <a href="/mylist" class="menu-list-item"
+      ><i class="fa-solid fa-list"></i> My List</a
+    >
+  </div>
+
+  <div class="search-container">
+    <i class="fas fa-search search-icon"></i>
+    <input 
+      type="text" 
+      placeholder="Search movies and casts..." 
+      disabled
+    />
+    <i class="fas fa-times close-icon"></i>
+  </div>
+</nav>
+
+<!-- Vertical Navbar -->
+<div class="vertical-navbar" id="vertical-navbar">
+  <button class="sidebar-close" id="sidebar-close">
+    <i class="fas fa-times"></i>
+  </button>
+  <ul>
+    <li>
+      <a href="/" class="nav-item"><i class="ri-home-2-line"></i> Home</a>
+    </li>
+    <hr />
+    <% if (user) { %>
+    <li>
+      <a href="/profile/<%= user.id %>" class="nav-item"
+        ><i class="ri-user-6-line"></i> Profile</a
+      >
+    </li>
+    <li>
+      <a href="/mylist" class="nav-item"
+        ><i class="ri-list-ordered"></i> My List</a
+      >
+    </li>
+    <li>
+      <a href="/api/favorites" class="nav-item"
+        ><i class="fas fa-heart"></i> Favorites</a
+      >
+    </li>
+    <hr />
+    <li>
+      <a href="/contact" class="nav-item"
+        ><i class="ri-mail-send-line"></i> Contact us</a
+      >
+    </li>
+    <li>
+      <a href="/api/auth/logout" id="logout" class="nav-item"
+        ><i class="ri-logout-box-r-line"></i> Logout</a
+      >
+    </li>
+    <% } else { %>
+    <li>
+      <a href="/contact" class="nav-item"
+        ><i class="ri-mail-send-line"></i> Contact us</a
+      >
+    </li>
+    <hr />
+    <li>
+      <a href="/login" class="nav-item"
+        ><i class="ri-login-box-line"></i> Login</a
+      >
+    </li>
+    <% } %>
+  </ul>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchContainer = document.querySelector(".search-container");
+    const input = searchContainer.querySelector("input");
+    const searchIcon = searchContainer.querySelector(".search-icon");
+
+    // Enable the input if it's disabled in HTML
+    input.removeAttribute("disabled");
+
+    function triggerSearch() {
+      const query = input.value.trim();
+      const path = window.location.pathname;
+      let searchPath = "/search"; // default: home search
+      
+      if (path.startsWith("/movies")) {
+        searchPath = "/search/movies";
+      } else if (path.startsWith("/casts")) {
+        searchPath = "/search/casts";
+      } else if (path.startsWith("/mylist")) {
+        searchPath = "/search/mylist";
+      }
+      
+      if (query) {
+        window.location.href = `${searchPath}?q=${encodeURIComponent(query)}`;
+      }
+    }
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        triggerSearch();
+      }
+    });
+    searchIcon.addEventListener("click", function () {
+      triggerSearch();
+    });
+  });
+</script>

@@ -1,0 +1,70 @@
+<!-- Trailer Modal -->
+<div class="modal fade" id="trailerModal" tabindex="-1" aria-labelledby="trailerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-light" id="trailerModalLabel">Movie Trailer</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="ratio ratio-16x9">
+          <iframe id="trailerFrame" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-content {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333;
+}
+
+.modal-header {
+  border-bottom: 1px solid #333;
+}
+
+.modal-body {
+  padding: 0 !important;
+}
+
+#trailerFrame {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+</style>
+
+<script>
+function playTrailer(trailerURL) {
+  const modal = new bootstrap.Modal(document.getElementById('trailerModal'));
+  const trailerFrame = document.getElementById('trailerFrame');
+  
+  // Extract video ID from YouTube URL
+  let videoId = '';
+  if (trailerURL.includes('youtube.com/watch?v=')) {
+    videoId = trailerURL.split('v=')[1].split('&')[0];
+  } else if (trailerURL.includes('youtu.be/')) {
+    videoId = trailerURL.split('youtu.be/')[1];
+  }
+  
+  // Set the iframe source with proper YouTube embed URL
+  if (videoId) {
+    trailerFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+  } else {
+    trailerFrame.src = trailerURL;
+  }
+  
+  modal.show();
+  
+  // Clear the iframe source when modal is closed
+  document.getElementById('trailerModal').addEventListener('hidden.bs.modal', function () {
+    trailerFrame.src = '';
+  });
+}
+</script> 

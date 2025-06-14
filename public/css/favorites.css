@@ -1,0 +1,156 @@
+/* Favorites Page Styles */
+body {
+  background-color: rgb(0, 0, 0);
+  color: white;
+  font-family: 'Arial', sans-serif;
+}
+
+.favorites-container {
+  margin-top: 80px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.movie-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+.movie-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.movie-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7), transparent);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.movie-card:hover .movie-card-content {
+  transform: translateY(0);
+}
+
+.movie-card-title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.movie-card-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.movie-card-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.movie-card-button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.watch-btn {
+  background: linear-gradient(to right, #f5c518, #ffecb3);
+  color: #000;
+}
+
+.remove-btn {
+  background: rgba(255, 77, 77, 0.8);
+  color: #fff;
+}
+
+.movie-card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.watch-btn:hover {
+  background: linear-gradient(to right, #ffecb3, #f5c518);
+}
+
+.remove-btn:hover {
+  background: rgba(255, 77, 77, 1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.empty-state p {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+}
+
+.browse-btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, #fff, #ccc);
+  color: #000;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.browse-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+} 
