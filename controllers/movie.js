@@ -1,5 +1,20 @@
 import Movie from "../models/movie.js";
+import Cast from "../models/cast.js";
+import User from "../models/user.js";
+import Comment from "../models/comment.js";
 
+// Get all movies
+export const getMovies = async (req, res) => {
+  try {
+    const movies = await Movie.find().sort({ releasedate: -1 });
+    res.json(movies);
+  } catch (err) {
+    console.error("Error fetching movies:", err);
+    res.status(500).json({ error: "Failed to fetch movies" });
+  }
+};
+
+// Create a new movie
 export const createMovie = async (req, res) => {
   try {
     const {
@@ -8,42 +23,62 @@ export const createMovie = async (req, res) => {
       duration,
       rating,
       genre,
-      cast,
+      cast, // array of cast names
       description,
       posterURL,
       trailerURL,
       category,
     } = req.body;
 
-    if (!title || !releasedate || !duration || !rating || !genre || !cast || !description || !posterURL || !trailerURL ||!category) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!title || !releasedate || !duration || !rating || !genre || !cast || !description || !posterURL || !trailerURL || !category) {
+      return res.status(400).json({ message: "❌ Missing required fields" });
     }
 
+    if (!Array.isArray(cast)) {
+      return res.status(400).json({ message: "❌ Cast must be an array of names" });
+    }
 
+    // Process cast members
+    const castIds = await Promise.all(
+      cast.map(async (actorName) => {
+        let existing = await Cast.findOne({ name: actorName });
+        if (!existing) {
+          existing = new Cast({
+            name: actorName,
+            birthdate: new Date(), // Placeholder
+            nationality: "Unknown",
+            description: "No description provided.",
+            photoURL: '/images/default-cast.jpg',
+            profileImageURL: '/images/default-cast.jpg'
+          });
+          await existing.save();
+        }
+        return existing._id;
+      })
+    );
 
-    // Create a new movie document
     const movie = new Movie({
       title,
       releasedate,
       duration,
       rating,
-      genre ,
-      cast,
+      genre,
+      cast: castIds,
       description,
       posterURL,
       trailerURL,
-      category,  // Corrected the typo here
+      category,
     });
 
-    // Save the movie to the database
     await movie.save();
-    res.status(201).json(movie); // Respond with the created movie
+    res.status(201).json({ message: "✅ Movie created successfully", movie });
   } catch (err) {
     console.error("Error creating movie:", err);
-    res.status(500).json({ error: "Failed to create movie", details: err.message });
+    res.status(500).json({ message: "❌ Failed to create movie", details: err.message });
   }
 };
 
+// Update a movie
 export const updateMovie = async (req, res) => {
   try {
     const {
@@ -59,95 +94,174 @@ export const updateMovie = async (req, res) => {
       category,
     } = req.body;
 
-    // Validate required fields
-    if (
-      !title ||
-      !releasedate ||
-      !duration ||
-      !rating ||
-      !genre ||
-      !description||
-      !posterURL||
-      !trailerURL||
-      !category
-    ) {
-      return res.status(400).json({ message: "Missing required fields." });
+    if (!title || !releasedate || !duration || !rating || !genre || !cast || !description || !posterURL || !trailerURL || !category) {
+      return res.status(400).json({ message: "❌ Missing required fields" });
     }
 
-    // Ensure genre is an array
     if (!Array.isArray(genre)) {
-      return res.status(400).json({ message: "Genre must be an array." });
+      return res.status(400).json({ message: "❌ Genre must be an array" });
     }
 
-    // Ensure cast is an array of objects with 'name'
-    if (!Array.isArray(cast) || cast.some((actor) => !actor.name)) {
-      return res
-        .status(400)
-        .json({ message: "Cast must be an array of objects with a 'name' field." });
+    if (!Array.isArray(cast) || cast.some(actor => !actor.name)) {
+      return res.status(400).json({ message: "❌ Cast must be an array of objects with a 'name' field" });
     }
 
-    const updatedData = {
-      title,
-      releasedate,
-      duration,
-      rating,
-      genre,
-      cast,
-      description,
-      posterURL,
-      trailerURL,
-      category,
-    };
+    const castIds = await Promise.all(
+      cast.map(async (actor) => {
+        let existing = await Cast.findOne({ name: actor.name });
+        if (!existing) {
+          existing = new Cast({
+            name: actor.name,
+            birthdate: new Date(),
+            nationality: "Unknown",
+            description: "No description provided.",
+            profileImageURL: "https://default-profile.com/image.jpg",
+          });
+          await existing.save();
+        }
+        return existing._id;
+      })
+    );
 
-    const movie = await Movie.findByIdAndUpdate(req.params.id, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        releasedate,
+        duration,
+        rating,
+        genre,
+        cast: castIds,
+        description,
+        posterURL,
+        trailerURL,
+        category,
+      },
+      { new: true, runValidators: true }
+    );
 
-    if (!movie) {
-      return res.status(404).json({ message: "Movie not found." });
+    if (!updatedMovie) {
+      return res.status(404).json({ message: "❌ Movie not found" });
     }
 
-    res.status(200).json(movie);
+    res.status(200).json({ message: "✅ Movie updated successfully", movie: updatedMovie });
   } catch (err) {
     console.error("Update error:", err);
-    res.status(500).json({ message: "Failed to update movie.", details: err });
+    res.status(500).json({ message: "❌ Failed to update movie", details: err.message });
   }
 };
 
-
-
-
-// DELETE /movies/:id
+// Delete a movie
 export const deleteMovie = async (req, res) => {
   try {
     const movie = await Movie.findByIdAndDelete(req.params.id);
-    if (!movie) return res.status(404).json({ error: "Movie not found" });
-    res.json({ message: "Movie deleted successfully" });
+    if (!movie) return res.status(404).json({ message: "❌ Movie not found" });
+    res.json({ message: "✅ Movie deleted successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to delete movie" });
+    res.status(500).json({ message: "❌ Failed to delete movie" });
   }
 };
 
+// Get movie by ID (with populated cast and related movies)
 export const getMovieById = async (req, res) => {
   try {
-    const movie = await Movie.findById(req.params.id);
+    // Find movie and populate cast details with all necessary fields
+    const movie = await Movie.findById(req.params.id).populate({
+      path: "cast",
+      select: "name photoURL profileImageURL birthdate nationality description _id",
+      options: { lean: true } // Use lean() for better performance
+    });
 
     if (!movie) {
-      return res.status(404).send('Movie not found');
+      return res.status(404).send("Movie not found");
     }
 
-    // Get related movies (same genre, exclude current)
+    // Find related movies by shared genre
     const relatedMovies = await Movie.find({
-      _id: { $ne: movie._id }, // exclude current movie
-      genre: { $in: movie.genre } // same genre
-    }).limit(6); // limit for display
+      _id: { $ne: movie._id },
+      genre: { $in: movie.genre },
+    }).limit(6);
 
-    res.render('pages/movie', { movie, relatedMovies });
+    // Check if movie is in user's watchlist
+    let inList = false;
+    if (req.user) {
+      const user = await User.findById(req.user.id);
+      inList = user.watchlist.includes(movie._id);
+    }
+
+    // Fetch comments for the movie
+    const comments = await Comment.find({ movie: movie._id })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 });
+
+    // Render movie page with movie, related movies, and comments
+    res.render("pages/movie", { 
+      movie, 
+      relatedMovies, 
+      inList,
+      comments,
+      user: res.locals.user // Use res.locals.user for EJS templates
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    console.error("Error fetching movie:", err);
+    res.status(500).send("Server Error");
   }
-  
 };
+
+// Get movie recommendations based on genre and time period
+export const getMovieRecommendations = async (req, res) => {
+  try {
+    const { genre, time } = req.query;
+
+    if (!genre || !time) {
+      return res.status(400).json({ message: 'Genre and time period are required' });
+    }
+
+    // Define date ranges based on time period
+    let dateRange = {};
+    const currentYear = new Date().getFullYear();
+
+    switch (time) {
+      case 'recent':
+        dateRange = {
+          $gte: new Date(2020, 0, 1),
+          $lte: new Date(currentYear, 11, 31)
+        };
+        break;
+      case '2010s':
+        dateRange = {
+          $gte: new Date(2010, 0, 1),
+          $lt: new Date(2020, 0, 1)
+        };
+        break;
+      case 'classic':
+        dateRange = {
+          $lt: new Date(2010, 0, 1)
+        };
+        break;
+      default:
+        return res.status(400).json({ message: 'Invalid time period' });
+    }
+
+    // Find movies that match the genre and time period
+    const movies = await Movie.find({
+      genre: { $regex: new RegExp(genre, 'i') },
+      releasedate: dateRange
+    })
+    .sort({ rating: -1 })
+    .select('title posterURL rating releasedate genre _id');
+
+    if (movies.length === 0) {
+      return res.json(null); // Return null if no movies found
+    }
+
+    // Pick a random movie from the filtered list
+    const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+    res.json(randomMovie);
+  } catch (error) {
+    console.error('Error getting movie recommendations:', error);
+    res.status(500).json({ message: 'Error getting movie recommendations' });
+  }
+};
+

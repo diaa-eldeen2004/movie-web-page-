@@ -109,6 +109,12 @@
           return showFunToast("Password is required", "red");
         } else if (password.length < 6) {
           return showFunToast("Password must be at least 6 characters", "red");
+        } else if (!/[A-Z]/.test(password)) {
+          return showFunToast("Password must contain at least one capital letter", "red");
+        } else if (!/[0-9]/.test(password)) {
+          return showFunToast("Password must contain at least one number", "red");
+        } else if (!/[!@#$%^&*]/.test(password)) {
+          return showFunToast("Password must contain at least one special character (!@#$%^&*)", "red");
         }
 
         if (confirmPassword === "") {

@@ -1,28 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movies</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- External CSS -->
-  <link rel="stylesheet" href="/css/styles.css">
-  <!-- Icons CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body>
-  <!-- Include Navbar -->
-  <%- include('/partials/navbar') %>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>All Movies - Movie Website</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/movies.css" />
+    <!-- Icons CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <%- include('../partials/navbar.ejs') %>
+    <%- include('../partials/trailer-modal.ejs') %>
 
-  <!-- Movie Content -->
-  <section class="movie-section">
-    <h2>Movies</h2>
-    <p>List of movies will go here.</p>
-  </section>
+    <div class="movies-container">
+      <h1 class="page-title">All Movies</h1>
+      
+      <div class="movies-grid">
+        <% if (movies && movies.length > 0) { %>
+          <% movies.forEach(movie => { %>
+            <div class="movie-card">
+              <img src="<%= movie.posterURL %>" alt="<%= movie.title %>" />
+              <div class="movie-card-rating">⭐ <%= movie.rating %></div>
+              <div class="movie-card-content">
+                <div class="movie-card-title"><%= movie.title %></div>
+                <div class="movie-card-info">
+                  <%= new Date(movie.releasedate).getFullYear() %> • <%= movie.genre.join(', ') %>
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/movie/<%= movie._id %>" class="movie-card-button info-btn">
+                    <i class="fas fa-info-circle"></i> Info
+                  </a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="no-movies">
+            <p>No movies available at the moment.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
 
-  <!-- Include Footer -->
-  <%- include('/partials/footer') %>
-</body>
+    <!-- Admin Button -->
+    <% if (user != null && user.role == 'admin') { %>
+    <a href="/admin/:<%= user.id %>" class="sticky-button">
+      <i class="fa-solid fa-plus"></i>
+    </a>
+    <% } %>
+
+    <!-- Movie Recommendation Button and Interface -->
+    <button id="recommendationBtn" class="sticky-button recommendation-btn">
+      <i class="fas fa-film"></i>
+    </button>
+
+    <div id="recommendationChat" class="recommendation-chat">
+      <div class="chat-header">
+        <h5>Movie Recommendations</h5>
+        <button class="close-btn" onclick="toggleRecommendationChat()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="chat-body">
+        <div id="chatMessages" class="chat-messages">
+          <div class="message bot">
+            What kind of movies are you looking for?
+          </div>
+        </div>
+        <div class="chat-input">
+          <select id="genreSelect" class="form-select mb-2">
+            <option value="">Select Genre</option>
+            <option value="Action">Action</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Drama">Drama</option>
+            <option value="Horror">Horror</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Romance">Romance</option>
+            <option value="Thriller">Thriller</option>
+          </select>
+          <select id="timeSelect" class="form-select mb-2">
+            <option value="">Select Time Period</option>
+            <option value="recent">Recent (2020 - Present)</option>
+            <option value="2010s">2010s (2010 - 2019)</option>
+            <option value="classic">Classic (Before 2010)</option>
+          </select>
+          <button onclick="get_movie_recommendation()" class="btn btn-primary w-100">Search</button>
+        </div>
+      </div>
+      <div id="recommendationResults" class="recommendation-results">
+        <!-- Movie cards will be inserted here -->
+      </div>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="/js/script.js"></script>
+    <script>
+      function toggleRecommendationChat() {
+        const chat = document.getElementById('recommendationChat');
+        chat.classList.toggle('active');
+        if (chat.classList.contains('active')) {
+          get_movie_recommendation();
+        }
+      }
+
+      document.getElementById('recommendationBtn').addEventListener('click', toggleRecommendationChat);
+
+      async function get_movie_recommendation() {
+        const genre = document.getElementById('genreSelect').value;
+        const time = document.getElementById('timeSelect').value;
+        
+        if (!genre || !time) {
+          showfun('Please select both genre and time period', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch recommendations');
+          }
+
+          const movie = await response.json();
+          
+          const resultsDiv = document.getElementById('recommendationResults');
+          resultsDiv.innerHTML = '';
+
+          if (!movie) {
+            showfun('No movies found matching your criteria', 'info');
+            return;
+          }
+
+          const movieCard = `
+            <div class="movie-card">
+              <img src="${movie.posterURL}" alt="${movie.title}" />
+              <div class="movie-card-rating">⭐ ${movie.rating}</div>
+              <div class="movie-card-content">
+                <div class="movie-card-title">${movie.title}</div>
+                <div class="movie-card-info">
+                  ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
+                </div>
+                <div class="movie-card-buttons">
+                  <a href="/movie/${movie._id}" class="movie-card-button info-btn">
+                    <i class="fas fa-info-circle"></i> Info
+                  </a>
+                </div>
+              </div>
+            </div>
+            <button onclick="get_movie_recommendation()" class="get-another-movie">
+              <i class="fas fa-random"></i> Get Another Movie
+            </button>
+          `;
+          resultsDiv.innerHTML = movieCard;
+        } catch (error) {
+          console.error('Error fetching recommendations:', error);
+          showfun(error.message || 'Error fetching movie recommendations', 'error');
+        }
+      }
+    </script>
+  </body>
 </html>

@@ -186,6 +186,7 @@
           try {
             const response = await fetch(`/api/users/${userId}`, {
               method: "PUT",
+              credentials: 'include',
               headers: {
                 "Content-Type": "application/json",
               },

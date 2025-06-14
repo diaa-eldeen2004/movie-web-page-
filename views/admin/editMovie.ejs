@@ -422,6 +422,7 @@
           try {
             const response = await fetch(`/api/movies/${movieId}`, {
               method: "PUT",
+              credentials: 'include',
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(body),
             });
@@ -429,16 +430,16 @@
             const data = await response.json();
     
             if (response.ok) {
-              showFunToast("✅ Movie updated successfully!", "linear-gradient(to right, #00eaff, #00a8b5)");
+              showFunToast(data.message, "linear-gradient(to right, #00eaff, #00a8b5)");
               setTimeout(() => {
-                window.location.href = `/admin/:id`;
+                window.location.href = "/admin/:id";
               }, 1500);
             } else {
-              showFunToast(data.message || "❌ Update failed.", "red");
+              showFunToast(data.message, "red");
             }
           } catch (err) {
             console.error("Update error:", err);
-            showFunToast("❌ Server error occurred.", "red");
+            showFunToast("❌ Server error occurred", "red");
           }
         });
       });
