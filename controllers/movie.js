@@ -249,15 +249,16 @@ export const getMovieRecommendations = async (req, res) => {
       genre: { $regex: new RegExp(genre, 'i') },
       releasedate: dateRange
     })
-    .sort({ rating: -1 })
     .select('title posterURL rating releasedate genre _id');
 
     if (movies.length === 0) {
       return res.json(null); // Return null if no movies found
     }
 
-    // Pick a random movie from the filtered list
-    const randomMovie = movies[Math.floor(Math.random() * movies.length)];
+    // Use a more random selection method
+    const randomIndex = Math.floor(Math.random() * movies.length);
+    const randomMovie = movies[randomIndex];
+    
     res.json(randomMovie);
   } catch (error) {
     console.error('Error getting movie recommendations:', error);

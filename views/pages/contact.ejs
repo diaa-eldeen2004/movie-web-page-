@@ -18,29 +18,15 @@
         <p class="contact-description">We'd love to hear from you! If you have any questions or feedback, please don't hesitate to reach out.</p>
 
         <div class="contact-items">
-            <div class="contact-item">
-                <i class="ri-mail-line"></i>
-                <div class="contact-box">
-                    <span id="email">gmail</span>
-                    <i class="ri-file-copy-line copy-icon" onclick="copyText('dodgeldeen@gmail.com', this)"></i>
+            <% contacts.forEach(contact => { %>
+                <div class="contact-item">
+                    <i class="<%= contact.icon %>"></i>
+                    <div class="contact-box">
+                        <span id="<%= contact.type %>"><%= contact.displayName %></span>
+                        <i class="ri-file-copy-line copy-icon" onclick="copyText('<%= contact.value %>', this)"></i>
+                    </div>
                 </div>
-            </div>
-
-            <div class="contact-item">
-                <i class="ri-facebook-circle-line"></i>
-                <div class="contact-box">
-                    <span id="facebook">facebook</span>
-                    <i class="ri-file-copy-line copy-icon" onclick="copyText('https://www.facebook.com/diaaeldeen.amin.1', this)"></i>
-                </div>
-            </div>
-
-            <div class="contact-item">
-                <i class="ri-instagram-line"></i>
-                <div class="contact-box">
-                    <span id="instagram">instgram</span>
-                    <i class="ri-file-copy-line copy-icon" onclick="copyText('https://www.instagram.com/_dod_012/?next=%2F', this)"></i>
-                </div>
-            </div>
+            <% }) %>
         </div>
     </div>
 

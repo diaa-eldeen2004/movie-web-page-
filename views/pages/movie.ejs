@@ -139,6 +139,33 @@
       .get-another-movie:hover {
         background: #3a3a3a;
       }
+
+      .sticky-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(to right, #00eaff, #00a8b5);
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .sticky-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+      }
+
+      .admin-btn {
+        bottom: 80px; /* Position the admin button higher */
+      }
     </style>
   </head>
   <body>
@@ -260,55 +287,55 @@
     </div>
 
     <!-- Movie Recommendation Button and Interface -->
-    <% if (user && user.role === 'user') { %>
-    <button id="recommendationBtn" class="sticky-button recommendation-btn">
-      <i class="fas fa-film"></i>
-    </button>
-
-    <div id="recommendationChat" class="recommendation-chat">
-      <div class="chat-header">
-        <h5>Movie Recommendations</h5>
-        <button class="close-btn" onclick="toggleRecommendationChat()">
-          <i class="fas fa-times"></i>
+    <% if (user) { %>
+      <% if (user.role === 'user') { %>
+        <button id="recommendationBtn" class="sticky-button recommendation-btn">
+          <i class="fas fa-film"></i>
         </button>
-      </div>
-      <div class="chat-body">
-        <div id="chatMessages" class="chat-messages">
-          <div class="message bot">
-            What kind of movies are you looking for?
+
+        <div id="recommendationChat" class="recommendation-chat">
+          <div class="chat-header">
+            <h5>Movie Recommendations</h5>
+            <button class="close-btn" onclick="toggleRecommendationChat()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="chat-body">
+            <div id="chatMessages" class="chat-messages">
+              <div class="message bot">
+                What kind of movies are you looking for?
+              </div>
+            </div>
+            <div class="chat-input">
+              <select id="genreSelect" class="form-select mb-2">
+                <option value="">Select Genre</option>
+                <option value="Action">Action</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Horror">Horror</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Romance">Romance</option>
+                <option value="Thriller">Thriller</option>
+              </select>
+              <select id="timeSelect" class="form-select mb-2">
+                <option value="">Select Time Period</option>
+                <option value="recent">Recent (2020 - Present)</option>
+                <option value="2010s">2010s (2010 - 2019)</option>
+                <option value="classic">Classic (Before 2010)</option>
+              </select>
+              <button onclick="get_movie_recommendation()" class="btn btn-primary w-100">Search</button>
+            </div>
+          </div>
+          <div id="recommendationResults" class="recommendation-results">
+            <!-- Movie cards will be inserted here -->
           </div>
         </div>
-        <div class="chat-input">
-          <select id="genreSelect" class="form-select mb-2">
-            <option value="">Select Genre</option>
-            <option value="Action">Action</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Drama">Drama</option>
-            <option value="Horror">Horror</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Romance">Romance</option>
-            <option value="Thriller">Thriller</option>
-          </select>
-          <select id="timeSelect" class="form-select mb-2">
-            <option value="">Select Time Period</option>
-            <option value="recent">Recent (2020 - Present)</option>
-            <option value="2010s">2010s (2010 - 2019)</option>
-            <option value="classic">Classic (Before 2010)</option>
-          </select>
-          <button onclick="get_movie_recommendation()" class="btn btn-primary w-100">Search</button>
-        </div>
-      </div>
-      <div id="recommendationResults" class="recommendation-results">
-        <!-- Movie cards will be inserted here -->
-      </div>
-    </div>
-    <% } %>
-
-    <!-- Admin Button -->
-    <% if (user && user.role === 'admin') { %>
-    <a href="/admin/:<%= user.id %>" class="sticky-button">
-      <i class="fa-solid fa-plus"></i>
-    </a>
+      <% } else if (user.role === 'admin') { %>
+        <a href="/admin/<%= user._id %>" class="sticky-button admin-btn">
+          <i class="fa-solid fa-plus"></i>
+        </a>
+      <% } %>
     <% } %>
 
     <!-- Inject current user ID for JS -->
@@ -482,7 +509,9 @@
         }
 
         try {
-          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
+          // Add a timestamp to prevent caching
+          const timestamp = new Date().getTime();
+          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}&t=${timestamp}`);
           
           if (!response.ok) {
             const errorData = await response.json();
@@ -491,8 +520,7 @@
 
           const movie = await response.json();
           const resultsDiv = document.getElementById('recommendationResults');
-          resultsDiv.innerHTML = '';
-
+          
           if (!movie) {
             if (genre && time) {
               showFunToast(`No movies found matching ${genre} genre from ${time} period`, 'error');
@@ -504,14 +532,32 @@
             return;
           }
 
-          resultsDiv.innerHTML = `
+          // Create new movie card
+          const movieCard = `
             <div class="recommendation-result">
-              <a href="/movie/${movie._id}" class="movie-link">${movie.title}</a>
+              <div class="movie-card">
+                <img src="${movie.posterURL}" alt="${movie.title}" />
+                <div class="movie-card-rating">⭐ ${movie.rating}</div>
+                <div class="movie-card-content">
+                  <div class="movie-card-title">${movie.title}</div>
+                  <div class="movie-card-info">
+                    ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
+                  </div>
+                  <div class="movie-card-buttons">
+                    <a href="/movie/${movie._id}" class="movie-card-button info-btn">
+                      <i class="fas fa-info-circle"></i> Info
+                    </a>
+                  </div>
+                </div>
+              </div>
               <button onclick="get_movie_recommendation()" class="get-another-movie">
                 <i class="fas fa-random"></i> Get Another Movie
               </button>
             </div>
           `;
+
+          // Replace the content
+          resultsDiv.innerHTML = movieCard;
 
           if (genre && time) {
             showFunToast(`Found a ${genre} movie from ${time} period!`, 'success');
