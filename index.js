@@ -13,6 +13,7 @@ import commentRoutes from "./routes/comment.js";
 import favoriteRoutes from "./routes/favorite.js";
 import profileRoutes from "./routes/profile.js";
 import searchRoutes from "./routes/search.js";
+import contactRoutes from "./routes/contact.js";
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/cast', castRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/profile", profileRoutes);
+app.use("/admin", contactRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -45,7 +47,7 @@ app.use((err, req, res, next) => {
   if (req.xhr || req.headers.accept.includes('application/json')) {
     res.status(500).json({ message: "❌ Server error occurred" });
   } else {
-    res.status(500).render("pages/error", { error: "Server error occurred" });
+    res.status(404).render("pages/404");
   }
 });
 

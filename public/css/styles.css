@@ -1055,8 +1055,8 @@ body {
 /* Sticky Button Styles */
 .sticky-button {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 5rem;
+  right: 3rem;
   background: linear-gradient(to right, #f5c518, #ffecb3);
   color: #181818;
   border: none;

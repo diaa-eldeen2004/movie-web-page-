@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import Movie from "../models/movie.js";
 import Cast from "../models/cast.js";
 import Comment from "../models/comment.js";
+import Contact from "../models/Contact.js";
 
 // Render the homepage with slider, trending, and new release movies
 export const getIndex = async (req, res) => {
@@ -27,8 +28,17 @@ export const getIndex = async (req, res) => {
 };
 
 // Render the contact page
-export const getContact = (req, res) => {
-  res.render("pages/contact", { user: req.user });
+export const getContact = async (req, res) => {
+  try {
+    const contacts = await Contact.find();
+    res.render("pages/contact", { 
+      user: req.user,
+      contacts 
+    });
+  } catch (error) {
+    console.error("Error loading contact page:", error);
+    res.status(500).render("pages/404");
+  }
 };
 
 // Render the movies page
@@ -133,15 +143,14 @@ export const getsettings = (req, res) => {
 // Render the admin dashboard
 export const getAdmin = async (req, res) => {
   try {
-
-    const [users, allMovies, sliderMovies, allCast, allComments, sliderCasts] = await Promise.all([
+    const [users, allMovies, sliderMovies, allCast, allComments, sliderCasts, contacts] = await Promise.all([
       User.find(),
       Movie.find(),
       Movie.find({ isInSlider: true }).sort({ sliderPosition: 1 }),
       Cast.find(),
       Comment.find().populate("user movie", "name title"),
       Cast.find({ isInSlider: true }).sort({ sliderPosition: 1 }).limit(3),
-
+      Contact.find()
     ]);
 
     res.render("admin/admin", {
@@ -151,7 +160,7 @@ export const getAdmin = async (req, res) => {
       Cast: allCast,
       Comments: allComments,
       sliderCasts,
-
+      contacts
     });
   } catch (err) {
     console.error("Error loading admin page:", err);

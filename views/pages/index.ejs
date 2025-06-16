@@ -225,6 +225,7 @@
           <select id="genreSelect" class="form-select mb-2">
             <option value="">Select Genre</option>
             <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
             <option value="Comedy">Comedy</option>
             <option value="Drama">Drama</option>
             <option value="Horror">Horror</option>
@@ -332,28 +333,18 @@
         }
 
         try {
-          // Log the request parameters
-          console.log('Requesting with params:', { genre, time });
-          
-          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}`);
-          
-          // Log the response status
-          console.log('Response status:', response.status);
+          // Add a timestamp to prevent caching
+          const timestamp = new Date().getTime();
+          const response = await fetch(`/api/movies/recommend?genre=${encodeURIComponent(genre)}&time=${encodeURIComponent(time)}&t=${timestamp}`);
           
           if (!response.ok) {
             const errorData = await response.json();
-            console.error('API Error:', errorData);
             throw new Error(errorData.message || 'Failed to fetch recommendations');
           }
 
           const movie = await response.json();
-          
-          // Log the received movie data
-          console.log('Received movie:', movie);
-          
           const resultsDiv = document.getElementById('recommendationResults');
-          resultsDiv.innerHTML = '';
-
+          
           if (!movie) {
             if (genre && time) {
               showfun(`No movies found matching ${genre} genre from ${time} period`, 'error');
@@ -365,6 +356,7 @@
             return;
           }
 
+          // Create new movie card
           const movieCard = `
             <div class="movie-card">
               <img src="${movie.posterURL}" alt="${movie.title}" />
@@ -375,10 +367,7 @@
                   ${new Date(movie.releasedate).getFullYear()} • ${movie.genre.join(', ')}
                 </div>
                 <div class="movie-card-buttons">
-                  <a
-                    href="/movie/${movie._id}"
-                    class="movie-card-button info-btn"
-                  >
+                  <a href="/movie/${movie._id}" class="movie-card-button info-btn">
                     <i class="fas fa-info-circle"></i> Info
                   </a>
                 </div>
@@ -388,9 +377,10 @@
               <i class="fas fa-random"></i> Get Another Movie
             </button>
           `;
+
+          // Replace the content
           resultsDiv.innerHTML = movieCard;
 
-          // Show success message based on filters used
           if (genre && time) {
             showfun(`Found a ${genre} movie from ${time} period!`, 'success');
           } else if (genre) {

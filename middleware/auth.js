@@ -1,47 +1,43 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
-const auth = (allowedRoles = []) => {
+export const auth = (allowedRoles = []) => {
   return async (req, res, next) => {
     try {
-      const token = req.cookies?.jwt;
-
-      if (!token) {
+      // Check if user is logged in
+      if (!req.user) {
         if (req.path.startsWith('/api/')) {
-          return res.status(401).json({ message: "❌ Authentication required" });
+          return res.status(401).json({ message: "❌ Unauthorized: Please login" });
         }
-        return res.redirect("/login");
+        return res.redirect('/login');
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id);
-      
+      // Get user from database to ensure role is current
+      const user = await User.findById(req.user._id);
       if (!user) {
-        res.clearCookie("jwt");
         if (req.path.startsWith('/api/')) {
-          return res.status(401).json({ message: "❌ User not found" });
+          return res.status(401).json({ message: "❌ Unauthorized: User not found" });
         }
-        return res.redirect("/login");
+        return res.redirect('/login');
       }
-
-      req.user = user;
-      res.locals.user = user;
 
       // If roles are defined, restrict access
       if (allowedRoles.length && !allowedRoles.includes(user.role)) {
         if (req.path.startsWith('/api/')) {
           return res.status(403).json({ message: "❌ Forbidden: Access denied" });
         }
-        return res.status(403).send("Forbidden: Access denied");
+        return res.status(404).render('pages/404');
       }
 
+      // Add user to request object
+      req.user = user;
       next();
     } catch (error) {
-      res.clearCookie("jwt");
+      console.error('Auth middleware error:', error);
       if (req.path.startsWith('/api/')) {
-        return res.status(401).json({ message: "❌ Invalid or expired token" });
+        return res.status(500).json({ message: "❌ Server error" });
       }
-      return res.redirect("/login");
+      return res.status(404).render('pages/404');
     }
   };
 };
