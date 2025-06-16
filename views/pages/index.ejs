@@ -289,6 +289,29 @@
     <!-- Custom JS -->
     <script type="module" src="/js/script.js"></script>
     <script>
+      function slideRow(button, direction) {
+        const rowContainer = button.closest('.row-container');
+        const row = rowContainer.querySelector('.movie-row');
+        const cards = row.querySelectorAll('.movie-card');
+        const cardWidth = cards[0].offsetWidth;
+        const gap = 20; // Gap between cards
+        const scrollAmount = (cardWidth + gap) * 4; // Scroll 4 cards at a time
+        
+        if (direction === 1) {
+          // Scroll right
+          row.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+          });
+        } else {
+          // Scroll left
+          row.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+          });
+        }
+      }
+
       function showfun(msg, type) {
         const colors = {
           error: '#ff4444',

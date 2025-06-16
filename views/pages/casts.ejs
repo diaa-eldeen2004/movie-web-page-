@@ -54,7 +54,7 @@
           <% sliderCasts.forEach((cast, i) => { %>
           <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
             <img
-              src="<%= cast.profileImageURL || 'https://via.placeholder.com/1280x720' %>"
+              src="<%= cast.profileImageURL %>"
               class="d-block w-100"
               alt="<%= cast.name %>"
             />
@@ -120,7 +120,7 @@
           <% if (trendingCasts && trendingCasts.length > 0) { %>
             <% trendingCasts.forEach(cast => { %>
             <div class="movie-card">
-              <img src="<%= cast.profileImageURL || 'https://via.placeholder.com/200' %>" alt="<%= cast.name %>" />
+              <img src="<%= cast.profileImageURL %>" alt="<%= cast.name %>" />
               <div class="movie-card-content">
                 <div class="movie-card-title"><%= cast.name %></div>
                 <div class="movie-card-info">
@@ -155,7 +155,7 @@
           <% if (bornToday && bornToday.length > 0) { %>
             <% bornToday.forEach(cast => { %>
             <div class="movie-card">
-              <img src="<%= cast.profileImageURL || 'https://via.placeholder.com/200' %>" alt="<%= cast.name %>" />
+              <img src="<%= cast.profileImageURL %>" alt="<%= cast.name %>" />
               <div class="movie-card-content">
                 <div class="movie-card-title"><%= cast.name %></div>
                 <div class="movie-card-info">
@@ -190,7 +190,7 @@
           <% if (allCast && allCast.length > 0) { %>
             <% allCast.forEach(cast => { %>
             <div class="movie-card">
-              <img src="<%= cast.profileImageURL || 'https://via.placeholder.com/200' %>" alt="<%= cast.name %>" />
+              <img src="<%= cast.profileImageURL %>" alt="<%= cast.name %>" />
               <div class="movie-card-content">
                 <div class="movie-card-title"><%= cast.name %></div>
                 <div class="movie-card-info">
@@ -224,5 +224,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script type="module" src="/js/script.js"></script>
+    <script>
+      function slideRow(button, direction) {
+        const rowContainer = button.closest('.row-container');
+        const row = rowContainer.querySelector('.movie-row');
+        const cards = row.querySelectorAll('.movie-card');
+        const cardWidth = cards[0].offsetWidth;
+        const gap = 20; // Gap between cards
+        const scrollAmount = (cardWidth + gap) * 4; // Scroll 4 cards at a time
+        
+        if (direction === 1) {
+          // Scroll right
+          row.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+          });
+        } else {
+          // Scroll left
+          row.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+          });
+        }
+      }
+    </script>
   </body>
 </html>
