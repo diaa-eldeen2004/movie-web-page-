@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="/css/singlecast.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+    </style>
   </head>
   <body>
     <%- include("../partials/navbar") %>
@@ -21,7 +23,7 @@
       <div class="cast-detail">
         <div class="cast-image-container">
           <img
-            src="<%= cast.photoURL || cast.profileImageURL %>"
+            src="<%= cast.profileImageURL %>"
             alt="<%= cast.name %>"
             class="cast-image"
           />
