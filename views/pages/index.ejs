@@ -264,7 +264,13 @@
               <div class="index-cast-card">
                 <a href="/cast/<%= cast._id %>" class="index-cast-link">
                   <div class="index-cast-image-container">
-                    <img src="<%= cast.photoURL || cast.profileImageURL || '/images/default-cast.jpg' %>" alt="<%= cast.name %>" class="index-cast-image" />
+                    <% if (cast.profileImageURL) { %>
+                      <img src="<%= cast.profileImageURL %>" alt="<%= cast.name %>" class="index-cast-image" />
+                    <% } else { %>
+                      <div class="no-image-message" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: #2a2a2a; color: #888;">
+                        <i class="fas fa-user"></i>
+                      </div>
+                    <% } %>
                   </div>
                   <div class="index-cast-name"><%= cast.name %></div>
                 </a>
