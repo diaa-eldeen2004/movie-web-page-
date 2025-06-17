@@ -166,6 +166,106 @@
       .admin-btn {
         bottom: 80px; /* Position the admin button higher */
       }
+
+      .row-container {
+        position: relative;
+        padding: 0 40px;
+      }
+
+      .slider-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+        transition: background-color 0.3s;
+      }
+
+      .slider-button:hover {
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      .slider-button.prev {
+        left: 0;
+      }
+
+      .slider-button.next {
+        right: 0;
+      }
+
+      .movie-row {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 20px 0;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+      }
+
+      .movie-row::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+
+      .movie-card {
+        flex: 0 0 auto;
+        width: 200px;
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.3s;
+      }
+
+      .movie-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .movie-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+      }
+
+      .movie-card-content {
+        padding: 15px;
+      }
+
+      .movie-card-title {
+        color: white;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .movie-card-info {
+        color: #888;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+      }
+
+      .movie-card-buttons {
+        display: flex;
+        justify-content: center;
+      }
+
+      .movie-card-button {
+        background: linear-gradient(to right, #00eaff, #00a8b5);
+        color: #000;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: transform 0.3s;
+      }
+
+      .movie-card-button:hover {
+        transform: translateY(-2px);
+      }
     </style>
   </head>
   <body>
@@ -257,23 +357,37 @@
     <% if (relatedMovies && relatedMovies.length > 0) { %>
       <section class="you-may-like-section container my-5">
         <h2>You May Like</h2>
-        <div class="row">
-          <% relatedMovies.forEach(similar => { %>
-            <div class="col-6 col-sm-4 col-md-3 mb-4">
-              <a href="/api/movies/<%= similar._id %>" class="text-decoration-none">
-                <div class="card h-100">
+        <div class="row-container">
+          <button class="slider-button prev" onclick="slideRow(this, -1)">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="slider-button next" onclick="slideRow(this, 1)">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <div class="movie-row">
+            <% relatedMovies.forEach(similar => { %>
+              <div class="movie-card">
+                <a href="/movie/<%= similar._id %>" class="text-decoration-none">
                   <img
                     src="<%= similar.posterURL %>"
-                    class="card-img-top"
                     alt="<%= similar.title %> poster"
+                    class="card-img-top"
                   />
-                  <div class="card-body text-center">
-                    <h6 class="card-title"><%= similar.title %></h6>
+                  <div class="movie-card-content">
+                    <div class="movie-card-title"><%= similar.title %></div>
+                    <div class="movie-card-info">
+                      <%= new Date(similar.releasedate).getFullYear() %> • <%= similar.genre.join(', ') %>
+                    </div>
+                    <div class="movie-card-buttons">
+                      <a href="/movie/<%= similar._id %>" class="movie-card-button info-btn">
+                        <i class="fas fa-info-circle"></i> Info
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </a>
-            </div>
-          <% }) %>
+                </a>
+              </div>
+            <% }) %>
+          </div>
         </div>
       </section>
     <% } %>
@@ -358,8 +472,32 @@
     <!-- Custom JS -->
     <script type="module" src="/js/script.js"></script>
 
-    <script type="module">
-      import showFunToast from "/js/toast.js";
+    <script>
+      // Make slideRow function globally available
+      window.slideRow = function(button, direction) {
+        const rowContainer = button.closest('.row-container');
+        const row = rowContainer.querySelector('.movie-row');
+        const cards = row.querySelectorAll('.movie-card');
+        if (cards.length === 0) return; // Guard against no cards
+        
+        const cardWidth = cards[0].offsetWidth;
+        const gap = 20; // Gap between cards
+        const scrollAmount = (cardWidth + gap) * 4; // Scroll 4 cards at a time
+        
+        if (direction === 1) {
+          // Scroll right
+          row.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+          });
+        } else {
+          // Scroll left
+          row.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+          });
+        }
+      };
 
       document.querySelectorAll(".save-to-list").forEach((btn) => {
         btn.addEventListener("click", async () => {
