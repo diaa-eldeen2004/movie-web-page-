@@ -42,13 +42,18 @@
           <% casts.forEach(cast => { %>
             <div class="col-md-3 mb-4 text-center">
               <a href="/cast/<%= cast._id %>" class="text-decoration-none">
-                <img 
-                  src="<%= cast.photoURL || cast.profileImageURL || '/images/default-cast.jpg' %>" 
-                  class="img-fluid rounded-circle shadow" 
-                  style="width: 150px; height: 150px; object-fit: cover;" 
-                  alt="<%= cast.name %>"
-                  onerror="this.src='/images/default-cast.jpg'"
-                />
+                <% if (cast.profileImageURL) { %>
+                  <img 
+                    src="<%= cast.profileImageURL %>" 
+                    class="img-fluid rounded-circle shadow" 
+                    style="width: 150px; height: 150px; object-fit: cover;" 
+                    alt="<%= cast.name %>"
+                  />
+                <% } else { %>
+                  <div class="no-image-message rounded-circle shadow" style="width: 150px; height: 150px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background-color: #2a2a2a; color: #888;">
+                    <i class="fas fa-user" style="font-size: 48px;"></i>
+                  </div>
+                <% } %>
                 <h6 class="mt-2 text-light"><%= cast.name %></h6>
               </a>
             </div>
