@@ -292,7 +292,12 @@ export const getMovieDetail = async (req, res) => {
     // Find related movies (same genre or cast)
     const relatedMovies = allMovies.filter(m => 
       m._id.toString() !== movieId && 
-      (m.genre === movie.genre || m.cast.some(c => movie.cast.includes(c)))
+      (
+        (Array.isArray(movie.genre) && Array.isArray(m.genre) && 
+         movie.genre.some(g => m.genre.includes(g))) || 
+        (movie.cast && m.cast && 
+         movie.cast.some(c => m.cast.some(mc => mc._id.toString() === c._id.toString())))
+      )
     ).slice(0, 8); // Limit to 8 related movies
 
     let isFavorite = false;
