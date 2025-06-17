@@ -23,15 +23,32 @@
       <% if (movies.length === 0) { %>
         <p>No movies found.</p>
       <% } else { %>
-        <div class="row">
-          <% movies.forEach(movie => { %>
-            <div class="col-md-3 mb-4">
-              <a href="/movie/<%= movie._id %>" class="text-decoration-none">
-                <img src="<%= movie.posterURL %>" class="img-fluid rounded shadow" alt="<%= movie.title %>" />
-                <h6 class="mt-2 text-center text-light"><%= movie.title %></h6>
-              </a>
-            </div>
-          <% }) %>
+        <div class="row-container">
+          <button class="slider-button prev" onclick="slideRow(this, -1)">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="slider-button next" onclick="slideRow(this, 1)">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <div class="movie-row">
+            <% movies.forEach(movie => { %>
+              <div class="movie-card">
+                <img src="<%= movie.posterURL %>" alt="<%= movie.title %>" />
+                <div class="movie-card-rating">⭐ <%= movie.rating %></div>
+                <div class="movie-card-content">
+                  <div class="movie-card-title"><%= movie.title %></div>
+                  <div class="movie-card-info">
+                    <%= new Date(movie.releasedate).getFullYear() %> • <%= movie.genre.join(', ') %>
+                  </div>
+                  <div class="movie-card-buttons">
+                    <a href="/movie/<%= movie._id %>" class="movie-card-button info-btn">
+                      <i class="fas fa-info-circle"></i> Info
+                    </a>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
         </div>
       <% } %>
       <h4 class="mt-5">Casts</h4>
@@ -63,5 +80,144 @@
     </div>
     <%- include('../partials/footer.ejs') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      .row-container {
+        position: relative;
+        padding: 0 20px;
+      }
+
+      .movie-row {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 20px 0;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .movie-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .slider-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s;
+      }
+
+      .slider-button:hover {
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      .slider-button.prev {
+        left: 0;
+      }
+
+      .slider-button.next {
+        right: 0;
+      }
+
+      .movie-card {
+        flex: 0 0 auto;
+        width: 250px;
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.3s;
+      }
+
+      .movie-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .movie-card img {
+        width: 100%;
+        height: 375px;
+        object-fit: cover;
+      }
+
+      .movie-card-content {
+        padding: 15px;
+      }
+
+      .movie-card-title {
+        color: white;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .movie-card-info {
+        color: #888;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+      }
+
+      .movie-card-buttons {
+        display: flex;
+        justify-content: center;
+      }
+
+      .movie-card-button {
+        background: linear-gradient(to right, #00eaff, #00a8b5);
+        color: #000;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: transform 0.3s;
+      }
+
+      .movie-card-button:hover {
+        transform: translateY(-2px);
+      }
+
+      .movie-card-rating {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #f5c518;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+    </style>
+    <script>
+      function slideRow(button, direction) {
+        const rowContainer = button.closest('.row-container');
+        const row = rowContainer.querySelector('.movie-row');
+        const cards = row.querySelectorAll('.movie-card');
+        const cardWidth = cards[0].offsetWidth;
+        const gap = 20; // Gap between cards
+        const scrollAmount = (cardWidth + gap) * 4; // Scroll 4 cards at a time
+        
+        if (direction === 1) {
+          // Scroll right
+          row.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+          });
+        } else {
+          // Scroll left
+          row.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+          });
+        }
+      }
+    </script>
   </body>
 </html>
