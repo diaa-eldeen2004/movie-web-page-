@@ -142,7 +142,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- Your Name - Initial work
+- Diaa Eldeen Amin
+- Youmnh Mohamed
+- Mariam Mohamed
+- Malak Mohamed
+- Youssef Amr
 
 ## 🙏 Acknowledgments
 
